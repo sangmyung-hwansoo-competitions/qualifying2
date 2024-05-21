@@ -20,7 +20,7 @@
         <param name="port" value="$(arg port)" />
     </node>
 
-    <node pkg="preparation" type="test_control.py" name="test_control" output="screen" 
+    <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen" 
         args="--host $(arg host) --port $(arg port) --res '960x640'" />
 
     <node pkg="rosbag" type="record" name="rosbag_record" output="screen"
