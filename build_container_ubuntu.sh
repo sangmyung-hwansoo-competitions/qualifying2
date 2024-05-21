@@ -28,8 +28,8 @@ USER_GID=1000
 
 LOCAL_WORKSPACE_DIR=$(pwd)/catkin_ws
 DOCKER_WORKSPACE_DIR=/home/$USERNAME/catkin_ws
-LOCAL_SIM_DIR=$(pwd)/km7_v2
-DOCKER_SIM_DIR="/home/$USERNAME/km7_v2"
+LOCAL_DEPENDENCY_DIR=$(pwd)/sim_dependency
+DOCKER_DEPENDENCY_DIR="/home/$USERNAME/sim_dependency"
 
 # UI permissions
 XSOCK=/tmp/.X11-unix
@@ -62,7 +62,7 @@ docker run -td --privileged --net=host --ipc=host \
     -e "ROS_IP=127.0.0.1" \
     --cap-add=SYS_PTRACE \
     -v $LOCAL_WORKSPACE_DIR:$DOCKER_WORKSPACE_DIR \
-    -v $LOCAL_SIM_DIR:$DOCKER_SIM_DIR \
+    -v $LOCAL_DEPENDENCY_DIR:$DOCKER_DEPENDENCY_DIR \
     -w $DOCKER_WORKSPACE_DIR \
     --user=$USER_UID:$USER_GID \
     $IMAGE_NAME bash
@@ -70,8 +70,8 @@ docker run -td --privileged --net=host --ipc=host \
 echo "$CONTAINER_NAME 컨테이너가 성공적으로 생성되었습니다."
 
 # 시뮬레이터 디펜던시 설치
-docker exec -it --user=root $CONTAINER_NAME bash -c "find $DOCKER_SIM_DIR/deb/ -name '*.deb' -exec apt install -y {} \; && \
-    cd $DOCKER_SIM_DIR/Linux/DivineCarla-Linux && \
+docker exec -it --user=root $CONTAINER_NAME bash -c "find $DOCKER_DEPENDENCY_DIR/deb/ -name '*.deb' -exec apt install -y {} \; && \
+    cd $DOCKER_DEPENDENCY_DIR && \
     pip3 install --ignore-installed -r requirements.txt && \
     pip3 uninstall carla && \
     pip3 install ./carla-0.9.10-cp38-cp38-linux_x86_64.whl"

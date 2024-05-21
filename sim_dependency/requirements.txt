@@ -1,0 +1,10 @@
+networkx
+numpy>=1.18.4
+distro
+future
+pygame
+matplotlib
+open3d
+psutil
+py-cpuinfo
+python-tr
