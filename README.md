@@ -39,7 +39,7 @@
         └── rpclib-2.2.1-3.deb
 ```
 
-## Installation(WSL2)
+## Installation (WSL2)
 
 ``` bash
 $ cd ~/
@@ -49,7 +49,7 @@ $ sudo ./build_container_ubuntu.sh
 ```
 
 
-## Usage
+## Usage (WSL2)
 
 ``` bash
 # CarlaUE4 디렉토리 속 퍼블릭키 입력 후 윈도우 상에서 CarlaUE4.exe 실행
