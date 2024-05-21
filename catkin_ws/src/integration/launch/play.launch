@@ -1,0 +1,15 @@
+<launch>
+    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data.bag" />
+    <arg name="loop" default="true" />
+    <arg name="rate" default="1.0" />
+
+    <node pkg="integration" type="image_receiver.py" name="show_image" output="screen" />
+
+    <group if="$(arg loop)">
+        <node pkg="rosbag" type="play" name="play_bag_with_loop" args="$(arg bag_file) --loop --rate=$(arg rate)" output="screen" />
+    </group>
+    
+    <group unless="$(arg loop)">
+        <node pkg="rosbag" type="play" name="play_bag_without_loop" args="$(arg bag_file) --rate=$(arg rate)" output="screen" />
+    </group>
+</launch>

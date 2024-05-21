@@ -47,7 +47,7 @@ $ sudo ./build_container_ubuntu.sh
 ``` bash
 # CarlaUE4 디렉토리 속 퍼블릭키 입력 후 윈도우 상에서 CarlaUE4.exe 실행
 $ sudo docker exec -it q2 bash
-$ roslaunch integration temp.launch
+$ roslaunch integration record.launch
 or
-$ start
+$ record
 ```

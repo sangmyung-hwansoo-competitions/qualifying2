@@ -4,10 +4,10 @@
 
     <arg name="camera_sensor_x" default="0.0" />
     <arg name="camera_sensor_y" default="0.0" />
-    <arg name="camera_sensor_z" default="0.0" />
+    <arg name="camera_sensor_z" default="1.5" />
     <arg name="lidar_sensor_x" default="0.0" />
     <arg name="lidar_sensor_y" default="0.0" />
-    <arg name="lidar_sensor_z" default="0.0" />
+    <arg name="lidar_sensor_z" default="1.5" />
 
     <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
         <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
@@ -20,7 +20,9 @@
         <param name="port" value="$(arg port)" />
     </node>
 
-    <node pkg="preparation" type="test_control.py" name="test_control" output="screen" args="--host $(arg host) --port $(arg port)" />
+    <node pkg="preparation" type="test_control.py" name="test_control" output="screen" 
+        args="--host $(arg host) --port $(arg port) --res '960x640'" />
 
-    <node pkg="rviz" type="rviz" name="rviz" />
+    <node pkg="rosbag" type="record" name="rosbag_record" output="screen"
+        args="-O $(find integration)/bag/usb_cam_recorded_data.bag /usb_cam/image_raw" />
 </launch>

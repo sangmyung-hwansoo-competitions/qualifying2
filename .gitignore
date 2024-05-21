@@ -1,4 +1,4 @@
-km7_v2/
+*.bag
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,c++,cmake,python,ros,ros2,visualstudio,visualstudiocode,eclipse,opencv,ninja
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,c++,cmake,python,ros,ros2,visualstudio,visualstudiocode,eclipse,opencv,ninja

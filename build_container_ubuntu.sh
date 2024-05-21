@@ -88,6 +88,7 @@ docker exec -it $CONTAINER_NAME bash -c "echo '' >> /home/$USERNAME/.bashrc && \
     echo 'export ROS_MASTER_URI=http://localhost:11311' >> /home/$USERNAME/.bashrc && \
     echo 'export ROS_HOSTNAME=localhost' >> /home/$USERNAME/.bashrc && \
     echo 'export HOSTIP=$(grep -m1 "nameserver" /etc/resolv.conf | awk "{print \$2}")' >> /home/$USERNAME/.bashrc && \
-    echo 'alias start=\"roslaunch integration temp.launch\"' >> /home/$USERNAME/.bashrc"
+    echo 'alias record=\"roslaunch integration record.launch\"' >> /home/$USERNAME/.bashrc && \
+    echo 'alias record=\"roslaunch integration play.launch\"' >> /home/$USERNAME/.bashrc"
 
 echo "프로젝트 설정이 성공적으로 완료되었습니다."
