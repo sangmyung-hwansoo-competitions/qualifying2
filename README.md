@@ -10,17 +10,25 @@
 ├── catkin_ws
 │   └── src
 │       ├── CMakeLists.txt -> /opt/ros/noetic/share/catkin/cmake/toplevel.cmake
+│       ├── control
+│       │   ├── CMakeLists.txt
+│       │   ├── package.xml
+│       │   └── src
+│       │       └── teleop_keyboard.py
 │       ├── integration
 │       │   ├── CMakeLists.txt
+│       │   ├── bag
+│       │   │   └── usb_cam_recorded_data.bag
 │       │   ├── launch
-│       │   │   └── temp.launch
-│       │   ├── package.xml
-│       │   └── rviz
-│       └── preparation
+│       │   │   ├── play.launch
+│       │   │   └── record.launch
+│       │   └── package.xml
+│       └── visualization
 │           ├── CMakeLists.txt
 │           ├── package.xml
+│           ├── rviz
 │           └── src
-│               └── test_control.py
+│               └── show_image.py
 └── sim_dependency
     ├── carla-0.9.10-cp38-cp38-linux_x86_64.whl
     ├── deb
