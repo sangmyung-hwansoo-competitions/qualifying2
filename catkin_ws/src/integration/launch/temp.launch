@@ -1,0 +1,26 @@
+<launch>
+    <arg name="host" default="$(env HOSTIP)" />
+    <arg name="port" default="2000" />
+
+    <arg name="camera_sensor_x" default="0.0" />
+    <arg name="camera_sensor_y" default="0.0" />
+    <arg name="camera_sensor_z" default="0.0" />
+    <arg name="lidar_sensor_x" default="0.0" />
+    <arg name="lidar_sensor_y" default="0.0" />
+    <arg name="lidar_sensor_z" default="0.0" />
+
+    <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
+        <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
+        <param name="camera_sensor_y" value="$(arg camera_sensor_y)" />
+        <param name="camera_sensor_z" value="$(arg camera_sensor_z)" />
+        <param name="lidar_sensor_x" value="$(arg lidar_sensor_x)" />
+        <param name="lidar_sensor_y" value="$(arg lidar_sensor_y)" />
+        <param name="lidar_sensor_z" value="$(arg lidar_sensor_z)" />
+        <param name="host" value="$(arg host)" />
+        <param name="port" value="$(arg port)" />
+    </node>
+
+    <node pkg="preparation" type="test_control.py" name="test_control" output="screen" args="--host $(arg host) --port $(arg port)" />
+
+    <node pkg="rviz" type="rviz" name="rviz" />
+</launch>
