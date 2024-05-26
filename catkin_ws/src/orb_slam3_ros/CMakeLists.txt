@@ -166,7 +166,7 @@ target_link_libraries(${PROJECT_NAME}
   -lcrypto
 )
 
-## ROS node
+## ROS node (monocular camera)
 add_executable(ros_mono
   src/ros_mono.cc
   src/common.cc
@@ -176,7 +176,7 @@ target_link_libraries(ros_mono
   ${catkin_LIBRARIES}
 )
 
-## ROS node
+## ROS node (monocular-inertial camera)
 add_executable(ros_mono_inertial 
   src/ros_mono_inertial.cc
   src/common.cc
@@ -186,7 +186,7 @@ target_link_libraries(ros_mono_inertial
   ${catkin_LIBRARIES}
 )
 
-## ROS node
+## ROS node (stereo camera)
 add_executable(ros_stereo 
   src/ros_stereo.cc
   src/common.cc
@@ -196,7 +196,7 @@ target_link_libraries(ros_stereo
   ${catkin_LIBRARIES}
 )
 
-## ROS node
+## ROS node (stereo-inertial camera)
 add_executable(ros_stereo_inertial
   src/ros_stereo_inertial.cc
   src/common.cc
@@ -206,7 +206,7 @@ target_link_libraries(ros_stereo_inertial
   ${catkin_LIBRARIES}
 )
 
-## ROS node
+## ROS node (RGB-D camera)
 add_executable(ros_rgbd
   src/ros_rgbd.cc
   src/common.cc
@@ -216,7 +216,7 @@ target_link_libraries(ros_rgbd
   ${catkin_LIBRARIES}
 )
 
-## ROS node
+## ROS node (RGB-D-inertial camera)
 add_executable(ros_rgbd_inertial
   src/ros_rgbd_inertial.cc
   src/common.cc
