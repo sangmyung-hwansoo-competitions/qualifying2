@@ -78,11 +78,11 @@ docker exec -it --user=root $CONTAINER_NAME bash -c "find $DOCKER_DEPENDENCY_DIR
 
 # 워크스페이스 설정
 docker exec -it --user=root $CONTAINER_NAME bash -c "chown -R $USERNAME:$PASSWORD $DOCKER_WORKSPACE_DIR"
-docker exec -it $CONTAINER_NAME bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
+docker exec -it $CONTAINER_NAME bash -c "source /opt/ros/noetic/setup.bash && catkin_make clean && catkin_make -j4"
 
 docker exec -it $CONTAINER_NAME bash -c "echo '' >> /home/$USERNAME/.bashrc && \
-    echo 'alias cm=\"cd $DOCKER_WORKSPACE_DIR && catkin_make\"' >> /home/$USERNAME/.bashrc && \
-    echo 'alias ccm=\"cd $DOCKER_WORKSPACE_DIR && rm -rf build/ devel/ && catkin_make\"' >> /home/$USERNAME/.bashrc && \
+    echo 'alias cm=\"cd $DOCKER_WORKSPACE_DIR && catkin_make -j4\"' >> /home/$USERNAME/.bashrc && \
+    echo 'alias ccm=\"cd $DOCKER_WORKSPACE_DIR && rm -rf build/ devel/ && catkin_make -j4\"' >> /home/$USERNAME/.bashrc && \
     echo 'source /opt/ros/noetic/setup.bash' >> /home/$USERNAME/.bashrc && \
     echo 'source $DOCKER_WORKSPACE_DIR/devel/setup.bash' >> /home/$USERNAME/.bashrc && \
     echo 'export ROS_MASTER_URI=http://localhost:11311' >> /home/$USERNAME/.bashrc && \

@@ -2,13 +2,13 @@
 FROM ubuntu:20.04
 
 # 비대화식 설치 모드 설정 및 패키지 소스 변경
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 RUN cd /etc/apt && sed -i 's/kr.archive.ubuntu.com/mirror.kakao.com/g' sources.list \
     && sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' sources.list \
     && sed -i 's/security.ubuntu.com/mirror.kakao.com/g' sources.list
 
 # 기본 패키지 설치
-RUN apt update && apt upgrade -y && apt install -y sudo wget git curl locales zip gpg tzdata keyboard-configuration console-setup vim gedit
+RUN apt update && apt install -y sudo wget git curl locales zip gpg tzdata keyboard-configuration console-setup vim gedit
 
 # 시간대 및 키보드 설정
 RUN unlink /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
@@ -34,6 +34,49 @@ RUN apt update && apt install -y gnupg curl lsb-release openssl && \
     rosdep init && rosdep update
 
 RUN apt autoremove -y
+
+# ORB-SLAM3 설치 위한 종속성
+RUN apt install -y gnupg2 curl lsb-core vim wget python3-pip libpng16-16 libjpeg-turbo8 libtiff5
+RUN apt install -y \
+        # Base tools
+        cmake \
+        build-essential \
+        git \
+        unzip \
+        pkg-config \
+        python3-dev \
+        # OpenCV dependencies
+        python3-numpy \
+        # Pangolin dependencies
+        libgl1-mesa-dev \
+        libglew-dev \
+        libpython3-dev \
+        libeigen3-dev \
+        apt-transport-https \
+        ca-certificates\
+        software-properties-common
+
+# Build OpenCV
+RUN apt install -y python3-dev python3-numpy 
+RUN apt install -y python-dev python-numpy
+RUN apt install -y libavcodec-dev libavformat-dev libswscale-dev
+RUN apt install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+RUN apt install -y libgtk-3-dev
+
+RUN cd /tmp && git clone https://github.com/opencv/opencv.git && \
+    cd opencv && \
+    git checkout 4.4.0 && \
+    mkdir build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_EXAMPLES=OFF  -D BUILD_DOCS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_TESTS=OFF -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j$(nproc) && make install && \
+    cd / && rm -rf /tmp/opencv
+
+# Build Pangolin
+RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
+cd Pangolin && git checkout v0.6 && mkdir build && cd build && \
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
+make -j$(nproc) && make install && \
+cd / && rm -rf /tmp/Pangolin
 
 # 새로운 사용자 생성 및 홈 디렉토리 설정
 ARG USERNAME
