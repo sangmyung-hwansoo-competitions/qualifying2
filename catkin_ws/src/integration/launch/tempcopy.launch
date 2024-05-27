@@ -1,16 +1,27 @@
 <launch>
-    <arg name="bag_file" default="$(find integration)/bag/Straight1.bag" />
-    <arg name="loop" default="false" />
-    <arg name="rate" default="1.0" />
+    <arg name="host" default="$(env HOSTIP)" />
+    <arg name="port" default="2000" />
 
-    <!-- ROS BAG REPLAY -->
-    <group if="$(arg loop)">
-        <node pkg="rosbag" type="play" name="play_bag_with_loop" args="$(arg bag_file) --loop --rate=$(arg rate)" output="screen" />
-    </group>
-    
-    <group unless="$(arg loop)">
-        <node pkg="rosbag" type="play" name="play_bag_without_loop" args="$(arg bag_file) --rate=$(arg rate)" output="screen" />
-    </group>
+    <arg name="camera_sensor_x" default="0.0" />
+    <arg name="camera_sensor_y" default="0.0" />
+    <arg name="camera_sensor_z" default="2.5" />
+    <arg name="lidar_sensor_x" default="0.0" />
+    <arg name="lidar_sensor_y" default="0.0" />
+    <arg name="lidar_sensor_z" default="3.0" />
+
+    <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
+        <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
+        <param name="camera_sensor_y" value="$(arg camera_sensor_y)" />
+        <param name="camera_sensor_z" value="$(arg camera_sensor_z)" />
+        <param name="lidar_sensor_x" value="$(arg lidar_sensor_x)" />
+        <param name="lidar_sensor_y" value="$(arg lidar_sensor_y)" />
+        <param name="lidar_sensor_z" value="$(arg lidar_sensor_z)" />
+        <param name="host" value="$(arg host)" />
+        <param name="port" value="$(arg port)" />
+    </node>
+
+    <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen" 
+        args="--host $(arg host) --port $(arg port) --res '960x640'" />
 
     <!-- ORB SLAM3 -->
     <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono" output="screen">
@@ -37,7 +48,7 @@
     <!-- <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
         <param name="/target_frame_name" value="/world" />
         <param name="/source_frame_name" value="/camera" />
-        <param name="/trajectory_update_rate" value="20.0" />
-        <param name="/trajectory_publish_rate" value="20.0" />
+        <param name="/trajectory_update_rate" value="5.0" />
+        <param name="/trajectory_publish_rate" value="5.0" />
     </node> -->
 </launch>

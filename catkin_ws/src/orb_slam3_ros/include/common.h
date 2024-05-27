@@ -44,6 +44,7 @@ extern image_transport::Publisher tracking_img_pub;
 
 void setup_services(ros::NodeHandle&, std::string);
 void setup_publishers(ros::NodeHandle&, image_transport::ImageTransport&, std::string);
+void setup_publishers(ros::NodeHandle&, image_transport::ImageTransport&, std::string, std::string);
 void publish_topics(ros::Time, Eigen::Vector3f = Eigen::Vector3f::Zero());
 
 void publish_camera_pose(Sophus::SE3f, ros::Time);
