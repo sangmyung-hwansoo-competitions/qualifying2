@@ -54,7 +54,10 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub_img = node_handler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage, &igb);
 
-    setup_publishers(node_handler, image_transport, node_name);
+    std::string mode;
+    node_handler.param<std::string>(node_name + "/mode", mode, "Localization");
+
+    setup_publishers(node_handler, image_transport, node_name, mode);
     setup_services(node_handler, node_name);
 
     ros::spin();

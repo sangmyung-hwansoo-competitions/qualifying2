@@ -82,6 +82,37 @@ void setup_publishers(ros::NodeHandle &node_handler, image_transport::ImageTrans
     }
 }
 
+void setup_publishers(ros::NodeHandle &node_handler, image_transport::ImageTransport &image_transport, std::string node_name, std::string mode)
+{
+    pose_pub = node_handler.advertise<geometry_msgs::PoseStamped>(node_name + "/camera_pose", 1);
+
+    tracked_mappoints_pub = node_handler.advertise<sensor_msgs::PointCloud2>(node_name + "/tracked_points", 1);
+
+    tracked_keypoints_pub = node_handler.advertise<sensor_msgs::PointCloud2>(node_name + "/tracked_key_points", 1);
+
+    all_mappoints_pub = node_handler.advertise<sensor_msgs::PointCloud2>(node_name + "/all_points", 1);
+
+    tracking_img_pub = image_transport.advertise(node_name + "/tracking_image", 1);
+
+    kf_markers_pub = node_handler.advertise<visualization_msgs::Marker>(node_name + "/kf_markers", 1000);
+
+    if (sensor_type == ORB_SLAM3::System::IMU_MONOCULAR || sensor_type == ORB_SLAM3::System::IMU_STEREO || sensor_type == ORB_SLAM3::System::IMU_RGBD)
+    {
+        odom_pub = node_handler.advertise<nav_msgs::Odometry>(node_name + "/body_odom", 1);
+    }
+
+    if (mode == "Localization")
+    {
+        pSLAM->ActivateLocalizationMode();
+        ROS_INFO("ORB MODE : %s\n", mode.c_str());
+    }
+    else
+    {
+        pSLAM->DeactivateLocalizationMode();
+        ROS_INFO("ORB MODE : %s\n", mode.c_str());
+    }
+}
+
 void publish_topics(ros::Time msg_time, Eigen::Vector3f Wbb)
 {
     Sophus::SE3f Twc = pSLAM->GetCamTwc();
