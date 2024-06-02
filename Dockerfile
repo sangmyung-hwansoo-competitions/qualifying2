@@ -29,7 +29,7 @@ RUN apt update && apt install -y gnupg curl lsb-release openssl && \
     sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - && \
     apt update && \
-    apt install -y ros-noetic-desktop-full ros-noetic-teleop-twist-keyboard ros-noetic-ackermann-msgs ros-noetic-derived-object-msgs ros-noetic-hector-trajectory-server&& \
+    apt install -y ros-noetic-desktop-full ros-noetic-teleop-twist-keyboard ros-noetic-ackermann-msgs ros-noetic-derived-object-msgs ros-noetic-hector-trajectory-server ros-noetic-cv-bridge ros-noetic-tf ros-noetic-message-filters ros-noetic-image-transport && \
     apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential python3-pip && \
     rosdep init && rosdep update
 
@@ -57,11 +57,7 @@ RUN apt install -y \
         software-properties-common
 
 # Build OpenCV
-RUN apt install -y python3-dev python3-numpy 
-RUN apt install -y python-dev python-numpy
-RUN apt install -y libavcodec-dev libavformat-dev libswscale-dev
-RUN apt install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
-RUN apt install -y libgtk-3-dev
+RUN apt install -y python3-dev python3-numpy python-dev python-numpy libavcodec-dev libavformat-dev libswscale-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libgtk-3-dev
 
 RUN cd /tmp && git clone https://github.com/opencv/opencv.git && \
     cd opencv && \
@@ -73,10 +69,19 @@ RUN cd /tmp && git clone https://github.com/opencv/opencv.git && \
 
 # Build Pangolin
 RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
-cd Pangolin && git checkout v0.6 && mkdir build && cd build && \
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
-make -j$(nproc) && make install && \
-cd / && rm -rf /tmp/Pangolin
+    cd Pangolin && git checkout v0.6 && mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j$(nproc) && make install && \
+    cd / && rm -rf /tmp/Pangolin
+
+# # Build Ceres
+# RUN apt install -y libgoogle-glog-dev libgflags-dev libatlas-base-dev
+
+# RUN cd /tmp && git clone https://github.com/ceres-solver/ceres-solver.git && \
+#     cd ceres-solver && git checkout 1.14.x && mkdir build && cd build && \
+#     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+#     make -j$(nproc) && make install && \
+#     cd / && rm -rf /tmp/ceres-solver
 
 # 새로운 사용자 생성 및 홈 디렉토리 설정
 ARG USERNAME

@@ -77,6 +77,7 @@ import math
 import random
 import re
 import weakref
+import yaml
 
 try:
     import pygame
@@ -151,19 +152,25 @@ class World(object):
         self.world = carla_world
         self.actor_role_name = args.rolename
         self.Mdim = (args.width, args.height)
+
         try:
             self.map = self.world.get_map()
         except RuntimeError as error:
             sys.exit(1)
+
         self.player = None
-        self.rule_sensor = None
+        ## Rule Sensor 제거하시려면 주석처리 해주세요##
+        # self.rule_sensor = None
+        ###########################################
         self.imu_sensor = None
         self.camera_manager = None
         self._weather_presets = find_weather_presets()
         self._weather_index = 0
         self._actor_filter = args.filter
         self._gamma = args.gamma
+
         self.restart()
+
         self.recording_enabled = False
         self.recording_start = 0
         self.constant_velocity_enabled = False
@@ -211,8 +218,6 @@ class World(object):
             self.destroy()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
         while self.player is None:
-            if self.GetSearchEgoVehicle():
-                break
             if not self.map.get_spawn_points():
                 print('There are no spawn points available in your map/town.')
                 print('Please add some Vehicle Spawn Point to your UE4 scene.')
@@ -220,7 +225,12 @@ class World(object):
             spawn_points = self.map.get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
-        self.rule_sensor = RuleSensor(self.player)
+            if self.player is None:
+                if self.GetSearchEgoVehicle():
+                    break
+        ## Rule Sensor 제거하시려면 주석처리 해주세요##
+        # self.rule_sensor = RuleSensor(self.player)
+        ###########################################
         self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.Mdim, self._gamma)
         self.camera_manager.transform_index = cam_pos_index
@@ -245,10 +255,17 @@ class World(object):
         self.camera_manager.index = None
 
     def destroy(self):
+        #       rule sensor 사용
+        # sensors = [
+        #     self.camera_manager.sensor,
+        #     self.imu_sensor.sensor,
+        #     self.rule_sensor.sensor]
+         
+        #       rule sensor 제거
         sensors = [
-            self.camera_manager.sensor,
-            self.imu_sensor.sensor,
-            self.rule_sensor.sensor]
+           self.camera_manager.sensor,
+           self.imu_sensor.sensor]
+            
         for sensor in sensors:
             if sensor is not None:
                 sensor.stop()
@@ -264,15 +281,13 @@ class World(object):
 
 class KeyboardControl(object):
     """Class that handles keyboard input."""
-    def __init__(self, world, start_in_autopilot):
-        self._autopilot_enabled = start_in_autopilot
+    def __init__(self, world):
         if isinstance(world.player, carla.Vehicle):
             self._control = carla.VehicleControl()
             self._lights = carla.VehicleLightState.NONE
             world.player.set_light_state(self._lights)
         elif isinstance(world.player, carla.Walker):
             self._control = carla.WalkerControl()
-            self._autopilot_enabled = False
             self._rotation = world.player.get_transform().rotation
         else:
             raise NotImplementedError("Actor type not supported")
@@ -288,10 +303,7 @@ class KeyboardControl(object):
                 if self._is_quit_shortcut(event.key):
                     return True
                 elif event.key == K_BACKSPACE:
-                    if self._autopilot_enabled:
-                        world.restart()
-                    else:
-                        world.restart()
+                    world.restart()
                 elif event.key == K_TAB:
                     world.camera_manager.toggle_camera()
                 elif event.key == K_c and pygame.key.get_mods() & KMOD_SHIFT:
@@ -327,8 +339,6 @@ class KeyboardControl(object):
                     # work around to fix camera at start of replaying
                     current_index = world.camera_manager.index
                     world.destroy_sensors()
-                    # disable autopilot
-                    self._autopilot_enabled = False
                     # replayer
                     client.replay_file("manual_recording.rec", world.recording_start, 0, 0)
                     world.camera_manager.set_sensor(current_index)
@@ -379,25 +389,24 @@ class KeyboardControl(object):
                     elif event.key == K_x:
                         current_lights ^= carla.VehicleLightState.RightBlinker
 
-        if not self._autopilot_enabled:
-            if isinstance(self._control, carla.VehicleControl):
-                self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
-                self._control.reverse = self._control.gear < 0
-                # Set automatic control-related vehicle lights
-                if self._control.brake:
-                    current_lights |= carla.VehicleLightState.Brake
-                else: # Remove the Brake flag
-                    current_lights &= ~carla.VehicleLightState.Brake
-                if self._control.reverse:
-                    current_lights |= carla.VehicleLightState.Reverse
-                else: # Remove the Reverse flag
-                    current_lights &= ~carla.VehicleLightState.Reverse
-                if current_lights != self._lights: # Change the light state only if necessary
-                    self._lights = current_lights
-                    world.player.set_light_state(carla.VehicleLightState(self._lights))
-            elif isinstance(self._control, carla.WalkerControl):
-                self._parse_walker_keys(pygame.key.get_pressed(), clock.get_time(), world)
-            world.player.apply_control(self._control)
+        if isinstance(self._control, carla.VehicleControl):
+            self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
+            self._control.reverse = self._control.gear < 0
+            # Set automatic control-related vehicle lights
+            if self._control.brake:
+                current_lights |= carla.VehicleLightState.Brake
+            else: # Remove the Brake flag
+                current_lights &= ~carla.VehicleLightState.Brake
+            if self._control.reverse:
+                current_lights |= carla.VehicleLightState.Reverse
+            else: # Remove the Reverse flag
+                current_lights &= ~carla.VehicleLightState.Reverse
+            if current_lights != self._lights: # Change the light state only if necessary
+                self._lights = current_lights
+                world.player.set_light_state(carla.VehicleLightState(self._lights))
+        elif isinstance(self._control, carla.WalkerControl):
+            self._parse_walker_keys(pygame.key.get_pressed(), clock.get_time(), world)
+        world.player.apply_control(self._control)
 
     def _parse_vehicle_keys(self, keys, milliseconds):
         if keys[K_UP] or keys[K_w]:
@@ -519,14 +528,17 @@ class CameraManager(object):
             (carla.Transform(carla.Location(x=-8.0, z=6.0), carla.Rotation(pitch=6.0)), Attachment.SpringArm),
             (carla.Transform(carla.Location(x=-1, y=-bound_y, z=0.5)), Attachment.Rigid)]
         self.transform_index = 1
+
         self.sensors = [
             ['sensor.camera.rgb', cc.Raw, 'Camera RGB', {}],
-            ['sensor.lidar.ray_cast', None, 'Lidar (Ray-Cast)', {'range': '50'}],
+            ['sensor.lidar.ray_cast', None, 'Lidar (Ray-Cast)', {'range': '150'}],
             ['sensor.camera.rgb', cc.Raw, 'Camera RGB Distorted',
                 {'lens_circle_multiplier': '3.0',
                 'lens_circle_falloff': '3.0',
                 'chromatic_aberration_intensity': '0.5',
                 'chromatic_aberration_offset': '0'}]]
+        # self.sensor_params = {}
+
         world = self._parent.get_world()
         bp_library = world.get_blueprint_library()
         for item in self.sensors:
@@ -546,9 +558,29 @@ class CameraManager(object):
                     if attr_name == 'range':
                         self.lidar_range = float(attr_value)
 
-
             item.append(bp)
+            # self.sensor_params[item[0]] = self.extract_attributes(bp)
+
         self.index = None
+        # config_path = os.path.join('/home/ubuntu/catkin_ws/src/integration/config', 'sensors_info.yaml')
+        # self.save_sensors_info(config_path)
+        # print(f'Sensor parameters saved to {config_path}')
+
+    # def extract_attributes(self, blueprint):
+    #     attributes = {}
+    #     for attr in blueprint:
+    #         try:
+    #             value = blueprint.get_attribute(attr.id)
+    #             attributes[attr.id] = str(value)
+    #         except RuntimeError as e:
+    #             print(f"Error extracting attribute {attr.id}: {e}")
+    #             attributes[attr.id] = "N/A"
+    #     return attributes
+
+    # def save_sensors_info(self, filepath):
+    #     with open(filepath, 'w') as file:
+    #         yaml.dump(self.sensor_params, file, default_flow_style=False)
+
 
     def toggle_camera(self):
         self.transform_index = (self.transform_index + 1) % len(self._camera_transforms)
@@ -638,7 +670,7 @@ def game_loop(args):
         display = pygame.display.set_mode((args.width, args.height), pygame.HWSURFACE | pygame.DOUBLEBUF)
         w = client.get_world()
         world = World(w, args)
-        controller = KeyboardControl(world, args.autopilot)
+        controller = KeyboardControl(world)
 
         clock = pygame.time.Clock()
         while True:
@@ -684,10 +716,6 @@ def main():
         default=2000,
         type=int,
         help='TCP port to listen to (default: 2000)')
-    argparser.add_argument(
-        '-a', '--autopilot',
-        action='store_true',
-        help='enable autopilot')
     argparser.add_argument(
         '--res',
         metavar='WIDTHxHEIGHT',

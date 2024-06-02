@@ -1,13 +1,20 @@
 <launch>
     <arg name="host" default="$(env HOSTIP)" />
     <arg name="port" default="2000" />
+    <arg name="res" default="960x640" />
 
     <arg name="camera_sensor_x" default="0.0" />
     <arg name="camera_sensor_y" default="0.0" />
     <arg name="camera_sensor_z" default="2.5" />
     <arg name="lidar_sensor_x" default="0.0" />
-    <arg name="lidar_sensor_y" default="0.0" />
-    <arg name="lidar_sensor_z" default="3.0" />
+    <arg name="lidar_sensor_y" default="2.0" />
+    <arg name="lidar_sensor_z" default="1.0" />
+    <arg name="_rule_sensor_on" default="0" />
+    <arg name="gamma" default="2.2" />
+
+    <arg name="brightness" default="50" />
+    <arg name="contrast" default="0.7" />
+    <arg name="saturation" default="0.7" />
 
     <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
         <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
@@ -16,17 +23,24 @@
         <param name="lidar_sensor_x" value="$(arg lidar_sensor_x)" />
         <param name="lidar_sensor_y" value="$(arg lidar_sensor_y)" />
         <param name="lidar_sensor_z" value="$(arg lidar_sensor_z)" />
+        <param name="_rule_sensor_on" value="$(arg _rule_sensor_on)" />
         <param name="host" value="$(arg host)" />
         <param name="port" value="$(arg port)" />
     </node>
 
     <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen" 
-        args="--host $(arg host) --port $(arg port) --res '960x640'" />
+        args="--host $(arg host) --port $(arg port) --gamma $(arg gamma) --res $(arg res)" />
+
+    <node pkg="perception" type="preprocessing_image.py" name="preprocessing_image" output="screen" 
+        args="--brightness $(arg brightness) --contrast $(arg contrast) --saturation $(arg saturation)" />
+
+    <!-- <node pkg="rosbag" type="record" name="rosbag_record" output="screen"
+        args="-O $(find integration)/bag/usb_cam_recorded_data.bag /usb_cam/image_raw" /> -->
 
     <!-- ORB SLAM3 -->
     <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono" output="screen">
         <!-- change the topics according to the dataset -->
-        <remap from="/camera/image_raw"    to="/usb_cam/image_raw"/>
+        <remap from="/camera/image_raw"    to="/usb_cam/image_processed"/>
 
         <!-- Parameters for original ORB-SLAM3 -->
         <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
@@ -45,10 +59,10 @@
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/orb_salm3_no_imu.rviz" output="screen" />
 
     <!-- Trajectory path -->
-    <!-- <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
         <param name="/target_frame_name" value="/world" />
         <param name="/source_frame_name" value="/camera" />
-        <param name="/trajectory_update_rate" value="5.0" />
-        <param name="/trajectory_publish_rate" value="5.0" />
-    </node> -->
+        <param name="/trajectory_update_rate" value="20.0" />
+        <param name="/trajectory_publish_rate" value="20.0" />
+    </node>
 </launch>

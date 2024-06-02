@@ -1,5 +1,5 @@
 <launch>
-    <arg name="bag_file" default="$(find integration)/bag/Straight1.bag" />
+    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data.bag" />
     <arg name="loop" default="false" />
     <arg name="rate" default="1.0" />
 
