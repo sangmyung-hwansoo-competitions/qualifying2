@@ -29,7 +29,7 @@ RUN apt update && apt install -y gnupg curl lsb-release openssl && \
     sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - && \
     apt update && \
-    apt install -y ros-noetic-desktop-full ros-noetic-teleop-twist-keyboard ros-noetic-ackermann-msgs ros-noetic-derived-object-msgs ros-noetic-hector-trajectory-server ros-noetic-cv-bridge ros-noetic-tf ros-noetic-message-filters ros-noetic-image-transport && \
+    apt install -y ros-noetic-desktop-full ros-noetic-teleop-twist-keyboard ros-noetic-ackermann-msgs ros-noetic-derived-object-msgs ros-noetic-hector-trajectory-server ros-noetic-cv-bridge ros-noetic-tf ros-noetic-message-filters ros-noetic-image-transport ros-noetic-pcl-ros && \
     apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential python3-pip && \
     rosdep init && rosdep update
 
@@ -59,13 +59,25 @@ RUN apt install -y \
 # Build OpenCV
 RUN apt install -y python3-dev python3-numpy python-dev python-numpy libavcodec-dev libavformat-dev libswscale-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libgtk-3-dev
 
-RUN cd /tmp && git clone https://github.com/opencv/opencv.git && \
+RUN cd /tmp && git clone https://github.com/opencv/opencv.git && git clone https://github.com/opencv/opencv_contrib.git && \
+    cd opencv_contrib && \
+    git checkout 4.4.0 && cd .. && \
     cd opencv && \
     git checkout 4.4.0 && \
     mkdir build && cd build && \
-    cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_EXAMPLES=OFF  -D BUILD_DOCS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_TESTS=OFF -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
+    cmake -D CMAKE_BUILD_TYPE=Release \
+          -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib/modules \
+          -D BUILD_opencv_python3=OFF \
+          -D BUILD_opencv_python2=OFF \
+          -D BUILD_DOCS=OFF \
+          -D BUILD_EXAMPLES=OFF \
+          -D BUILD_TESTS=OFF \
+          -D BUILD_PERF_TESTS=OFF \
+          -D BUILD_opencv_java=OFF \
+          -D BUILD_opencv_js=OFF \
+          -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
     make -j$(nproc) && make install && \
-    cd / && rm -rf /tmp/opencv
+    cd / && rm -rf /tmp/opencv /tmp/opencv_contrib
 
 # Build Pangolin
 RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
@@ -74,14 +86,22 @@ RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
     make -j$(nproc) && make install && \
     cd / && rm -rf /tmp/Pangolin
 
-# # Build Ceres
-# RUN apt install -y libgoogle-glog-dev libgflags-dev libatlas-base-dev
+# Build Ceres
+RUN apt install -y libgoogle-glog-dev libgflags-dev libatlas-base-dev
 
 # RUN cd /tmp && git clone https://github.com/ceres-solver/ceres-solver.git && \
 #     cd ceres-solver && git checkout 1.14.x && mkdir build && cd build && \
 #     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
 #     make -j$(nproc) && make install && \
 #     cd / && rm -rf /tmp/ceres-solver
+
+# Build DSO
+RUN apt install -y libsuitesparse-dev libeigen3-dev libboost-all-dev zlib1g-dev
+
+RUN cd /tmp && git clone https://github.com/Lee-hwansoo/dso.git && \
+    cd dso && mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j12
 
 # 새로운 사용자 생성 및 홈 디렉토리 설정
 ARG USERNAME

@@ -78,7 +78,8 @@ docker exec -it --user=root $CONTAINER_NAME bash -c "find $DOCKER_DEPENDENCY_DIR
 
 # 워크스페이스 설정
 docker exec -it --user=root $CONTAINER_NAME bash -c "chown -R $USERNAME:$PASSWORD $DOCKER_WORKSPACE_DIR"
-docker exec -it $CONTAINER_NAME bash -c "source /opt/ros/noetic/setup.bash && catkin_make clean && catkin_make -j4"
+docker exec -it --user=root $CONTAINER_NAME bash -c "cd $DOCKER_WORKSPACE_DIR/src/ov2slam && ./build_thirdparty.sh"
+docker exec -it $CONTAINER_NAME bash -c "source /opt/ros/noetic/setup.bash && catkin_make -j4"
 
 docker exec -it $CONTAINER_NAME bash -c "echo '' >> /home/$USERNAME/.bashrc && \
     echo 'alias cm=\"cd $DOCKER_WORKSPACE_DIR && catkin_make -j4\"' >> /home/$USERNAME/.bashrc && \

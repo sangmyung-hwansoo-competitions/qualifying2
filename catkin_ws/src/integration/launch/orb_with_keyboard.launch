@@ -38,9 +38,8 @@
         args="-O $(find integration)/bag/usb_cam_recorded_data.bag /usb_cam/image_raw" /> -->
 
     <!-- ORB SLAM3 -->
-    <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono" output="screen">
-        <!-- change the topics according to the dataset -->
-        <remap from="/camera/image_raw"    to="/usb_cam/image_processed"/>
+    <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono" output="screen"
+        args="$(find orb_slam3)/config/integration.yaml"/>
 
         <!-- Parameters for original ORB-SLAM3 -->
         <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
