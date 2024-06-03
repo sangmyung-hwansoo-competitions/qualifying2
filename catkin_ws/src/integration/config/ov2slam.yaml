@@ -6,6 +6,7 @@
 #--------------------------------------------------------------------------------------------
 
 Camera.topic_left: /usb_cam/image_raw
+Camera.topic_right: /cam1/image_raw
 
 Camera.model_left: pinhole
 Camera.model_right: pinhole
@@ -13,8 +14,8 @@ Camera.model_right: pinhole
 Camera.left_nwidth: 800
 Camera.left_nheight: 600
 
-Camera.right_nwidth: 1241
-Camera.right_nheight: 376
+Camera.right_nwidth: 800
+Camera.right_nheight: 600
 
 # Camera calibration and distortion parameters (OpenCV) 
 Camera.fxl: 350.0
@@ -27,10 +28,10 @@ Camera.k2l: 0.
 Camera.p1l: 0.
 Camera.p2l: 0.
 
-Camera.fxr: 718.856
-Camera.fyr: 718.856
-Camera.cxr: 607.1928
-Camera.cyr: 185.2157
+Camera.fxr: 350.0
+Camera.fyr: 350.0
+Camera.cxr: 400.0
+Camera.cyr: 300.0
 
 Camera.k1r: 0.
 Camera.k2r: 0.
@@ -52,7 +53,7 @@ body_T_cam1: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d
-   data: [1., 0., 0., 0.537165718864418,
+   data: [1., 0., 0., 0.,
           0., 1., 0., 0.,
           0., 0., 1., 0.,
            0., 0., 0., 1.]
@@ -100,8 +101,8 @@ nfast_th: 10
 dmaxquality: 0.001 # used for gftt or singlescale
 
 # Pre-processing
-use_clahe: 0
-fclahe_val: 2
+use_clahe: 1
+fclahe_val: 2.5
 
 # KLT related settings.
 do_klt: 1

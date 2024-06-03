@@ -103,6 +103,13 @@ RUN cd /tmp && git clone https://github.com/Lee-hwansoo/dso.git && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
     make -j12
 
+# Build opengv
+RUN cd /tmp && git clone https://github.com/laurentkneip/opengv.git && \
+    cd opengv && mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j$(nproc) && make install && \
+    cd / && rm -rf /tmp/opengv
+
 # 새로운 사용자 생성 및 홈 디렉토리 설정
 ARG USERNAME
 ARG PASSWORD

@@ -7,8 +7,8 @@
     <arg name="camera_sensor_y" default="0.0" />
     <arg name="camera_sensor_z" default="2.5" />
     <arg name="lidar_sensor_x" default="0.0" />
-    <arg name="lidar_sensor_y" default="2.0" />
-    <arg name="lidar_sensor_z" default="1.0" />
+    <arg name="lidar_sensor_y" default="0.0" />
+    <arg name="lidar_sensor_z" default="2.5" />
     <arg name="_rule_sensor_on" default="0" />
     <arg name="gamma" default="2.2" />
 
@@ -33,5 +33,5 @@
     <node name="ov2slam" pkg="ov2slam" type="ov2slam_node" output="screen"
         args="$(find integration)/config/ov2slam.yaml" />
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ov2slam)/ov2slam_visualization.rviz" output="screen" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/ov2slam.rviz" output="screen" />
 </launch>
