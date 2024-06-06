@@ -136,7 +136,7 @@ def roi(image): # ROI 셋팅1 (영역 2개)
     point5 = (int(0.6 * x), int(1 * y)) # 오른쪽 차선 좌하단
     point6 = (int(0.53 * x), int(0.1 * y)) # 오른쪽 차선 좌상단
     point7 = (int(0.67 * x), int(0.1 * y)) # 오른쪽 차선 우상단
-    point8 = (int(0.99 * x), int(1 * y)) # 오른쪽 차선 우하단
+    point8 = (int(0.95 * x), int(0.1 * y)) # 오른쪽 차선 우하단
     point9 = (int(0 * x), int(1 * y))
 
     _shape = np.array([point1, point2, point3, point4, point5, point6, point7, point8, point9])
@@ -169,7 +169,7 @@ def roi_with_overlay(image):  # ROI 셋팅1 (영역 2개)와 투명도 오버레
     point5 = (int(0.6 * x), int(1 * y)) # 오른쪽 차선 좌하단
     point6 = (int(0.53 * x), int(0.1 * y)) # 오른쪽 차선 좌상단
     point7 = (int(0.67 * x), int(0.1 * y)) # 오른쪽 차선 우상단
-    point8 = (int(0.99 * x), int(1 * y)) # 오른쪽 차선 우하단
+    point8 = (int(0.95 * x), int(1 * y)) # 오른쪽 차선 우하단
     point9 = (int(0 * x), int(1 * y))
 
     _shape = np.array([point1, point2, point3, point4, point5, point6, point7, point8, point9])
