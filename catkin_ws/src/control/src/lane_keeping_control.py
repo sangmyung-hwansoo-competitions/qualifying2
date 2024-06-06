@@ -67,6 +67,7 @@ class LaneKeepingControl:
                 error_from_mid = self.c_coords.x - 400
                 control_output = self.pid.get_control_output(error_from_mid)
                 self.steer_angle = max(-self.kXycarSteeringAngleLimit, min(control_output, self.kXycarSteeringAngleLimit))
+                self.steer_angle = 0
                 speed = self.speed_control(self.steer_angle*0.85)
                 print(self.steer_angle*0.85, speed)
                 self.drive(self.steer_angle*0.85, speed)
