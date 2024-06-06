@@ -12,12 +12,6 @@
     <arg name="_rule_sensor_on" default="0" />
     <arg name="gamma" default="2.2" />
 
-    <arg name="brightness" default="10" />
-    <arg name="contrast" default="1.0" />
-    <arg name="saturation" default="1.0" />
-
-    <arg name="debug" default="True" />
-
     <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
         <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
         <param name="camera_sensor_y" value="$(arg camera_sensor_y)" />
@@ -36,7 +30,7 @@
 	<!-- <node pkg="perception" type="sig_sync.py" name="sync_listener" output="screen"/> -->
 	<node pkg="perception" type="start_signal.py" name="start_signal" output="screen"/>
 	<node pkg="perception" type="lane_detection.py" name="lane_detector" output="screen"/>
-	<!-- <node pkg="control" type="lane_keeping_control.py" name="lane_keeping" output="screen"/> -->
+	<node pkg="control" type="lane_keeping_control.py" name="lane_keeping" output="screen"/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/start.rviz" output="screen" />
 

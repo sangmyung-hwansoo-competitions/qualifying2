@@ -19,36 +19,35 @@ class StartSignalDetector:
         self.image_sub = rospy.Subscriber("/usb_cam/image_raw", Image, self.callback)
         self.signal_pub = rospy.Publisher('/start_signal', Bool, queue_size=1)
         self.debug = True
-        self.roi = (560, 315, 22, 20)
+        self.roi = (560, 305, 23, 23)
         
         self.start_signal = False
 
     def callback(self, data):
         try:
-            # if self.start_signal:
-            #     self.signal_pub.publish(self.start_signal)
-            #     return
+            if self.start_signal:
+                self.signal_pub.publish(self.start_signal)
+                return
 
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-            height, width = cv_image.shape[:2]
-    
             hls_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HLS)
-            processed_image = self.set_roi(hls_image, self.roi)
 
             # if self.debug:      
-            #     self.roi = cv2.selectROI("Select ROI", cv_image, fromCenter=False, showCrosshair=True)
+            #     self.roi = cv2.selectROI("Select ROI", hls_image, fromCenter=False, showCrosshair=True)
             #     cv2.destroyWindow("Select ROI")
             #     print(f"Selected ROI: {self.roi}")
 
-            if self.debug:  
-                def get_pixel_value(event, x, y, flags, param):
-                    if event == cv2.EVENT_LBUTTONDOWN:
-                        value = cv_image[y, x]
-                        print("클릭한 위치 (x={}, y={})".format(x, y))
-                        print("색상 값:", value)
-                cv2.imshow("processed_image", cv_image)
-                cv2.setMouseCallback('processed_image', get_pixel_value)
-                cv2.waitKey(1)
+            processed_image = self.set_roi(hls_image, self.roi)
+
+            # if self.debug:  
+            #     def get_pixel_value(event, x, y, flags, param):
+            #         if event == cv2.EVENT_LBUTTONDOWN:
+            #             value = processed_image[y, x]
+            #             print("클릭한 위치 (x={}, y={})".format(x, y))
+            #             print("색상 값:", value)
+            #     cv2.imshow("processed_image", processed_image)
+            #     cv2.setMouseCallback('processed_image', get_pixel_value)
+            #     cv2.waitKey(1)
 
             lower_green = np.array([40, 210, 245])
             upper_green = np.array([55, 225, 255])
@@ -62,8 +61,7 @@ class StartSignalDetector:
             if signal:
                 self.start_signal = True
 
-            # self.signal_pub.publish(self.start_signal)
-
+            self.signal_pub.publish(self.start_signal)
 
         except CvBridgeError as e:
             rospy.logerr(f"CvBridge Error: {e}")
