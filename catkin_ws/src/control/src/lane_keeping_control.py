@@ -58,7 +58,7 @@ class LaneKeepingControl:
         self.acceleration_step = 0.02
 
     def start_signal_callback(self, msg):
-        self.start_signal = msg
+        self.start_signal = msg.data
 
     def callback(self, data):
         if self.start_signal:
@@ -67,7 +67,7 @@ class LaneKeepingControl:
                 error_from_mid = self.c_coords.x - 400
                 control_output = self.pid.get_control_output(error_from_mid)
                 self.steer_angle = max(-self.kXycarSteeringAngleLimit, min(control_output, self.kXycarSteeringAngleLimit))
-                self.steer_angle = 0
+                self.steer_angle = 0    # 출발 테스트 용
                 speed = self.speed_control(self.steer_angle*0.85)
                 print(self.steer_angle*0.85, speed)
                 self.drive(self.steer_angle*0.85, speed)

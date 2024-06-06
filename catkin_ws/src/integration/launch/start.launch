@@ -9,7 +9,7 @@
     <arg name="lidar_sensor_x" default="0.0" />
     <arg name="lidar_sensor_y" default="0.0" />
     <arg name="lidar_sensor_z" default="2.5" />
-    <arg name="_rule_sensor_on" default="0" />
+    <arg name="_rule_sensor_on" default="1" />
     <arg name="gamma" default="2.2" />
 
     <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">

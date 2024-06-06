@@ -7,7 +7,7 @@ import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 import numpy as np
-
+import time  # 추가된 모듈
 
 class StartSignalDetector:
     def __init__(self):
@@ -39,19 +39,19 @@ class StartSignalDetector:
 
             processed_image = self.set_roi(hls_image, self.roi)
 
-            # if self.debug:  
-            #     def get_pixel_value(event, x, y, flags, param):
-            #         if event == cv2.EVENT_LBUTTONDOWN:
-            #             value = processed_image[y, x]
-            #             print("클릭한 위치 (x={}, y={})".format(x, y))
-            #             print("색상 값:", value)
-            #     cv2.imshow("processed_image", processed_image)
-            #     cv2.setMouseCallback('processed_image', get_pixel_value)
-            #     cv2.waitKey(1)
-
             lower_green = np.array([40, 210, 245])
             upper_green = np.array([55, 225, 255])
             mask = cv2.inRange(processed_image, lower_green, upper_green)
+
+            # if self.debug:  
+            #     def get_pixel_value(event, x, y, flags, param):
+            #         if event == cv2.EVENT_LBUTTONDOWN:
+            #             value = mask[y, x]
+            #             print("클릭한 위치 (x={}, y={})".format(x, y))
+            #             print("색상 값:", value)
+            #     cv2.imshow("processed_image", mask)
+            #     cv2.setMouseCallback('processed_image', get_pixel_value)
+            #     cv2.waitKey(1)
 
             green_pixels = np.sum(mask == 255)
             total_pixels = mask.size
@@ -78,6 +78,7 @@ class StartSignalDetector:
 
 if __name__ == '__main__':
     try:
+        time.sleep(0.5)  # 0.5초 대기
         start = StartSignalDetector()
         start.run()
     except rospy.ROSInterruptException:
