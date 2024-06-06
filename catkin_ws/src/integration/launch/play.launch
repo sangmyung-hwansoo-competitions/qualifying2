@@ -1,7 +1,7 @@
 <launch>
     <!-- <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data.bag" /> -->
     <!-- <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data_black.bag" /> -->
-    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data_black.bag" />
+    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data4.bag" />
     <arg name="loop" default="true" />
     <arg name="rate" default="7.0" />
 

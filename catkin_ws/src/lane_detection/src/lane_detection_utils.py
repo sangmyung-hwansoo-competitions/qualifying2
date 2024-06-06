@@ -96,16 +96,29 @@ def roi(image): # ROI 셋팅1 (영역 2개)
     # 한 붓 그리기
     # https://moon-coco.tistory.com/entry/OpenCV%EC%B0%A8%EC%84%A0-%EC%9D%B8%EC%8B%9D
     _shape = np.array(
-        
-        [[int(0*x), int(1*y)], 
-         [int(0*x), int(0.1*y)], 
-         [int(0.3*x), int(0.1*y)], 
-         [int(0.3*x), int(1*y)], 
-         [int(0.6*x), int(1*y)], 
-         [int(0.6*x), int(0.1*y)],
-         [int(0.99*x), int(0.1*y)], 
-         [int(0.99*x), int(1*y)], 
+        [[int(0 * x), int(1 * y)], # 왼쪽 차선 좌하단
+         [int(0 * x), int(0.1 * y)], # 왼쪽 차선 좌상단
+         [int(0.3 * x), int(0.1 * y)], # 왼쪽 차선 우상단
+         [int(0.3 * x), int(1 * y)], # 왼쪽 차선 우하단
+         [int(0.6 * x), int(1 * y)], # 오른쪽 차선 좌하단
+         [int(0.53 * x), int(0.1 * y)],# 오른쪽 차선 좌상단
+         [int(0.67 * x), int(0.1 * y)], # 오른쪽 차선 우상단
+         [int(0.99*x), int(1*y)], # 오른쪽 차선 우하단
          [int(0*x), int(1*y)]])
+    
+    
+    # _shape = np.array(
+        
+    #     [[int(0*x), int(1*y)], 
+    #      [int(0*x), int(0.1*y)], 
+    #      [int(0.3*x), int(0.1*y)], 
+    #      [int(0.3*x), int(1*y)], 
+    #      [int(0.6*x), int(1*y)], 
+    #      [int(0.6*x), int(0.1*y)],
+    #      [int(0.99*x), int(0.1*y)], 
+    #      [int(0.99*x), int(1*y)], 
+    #      [int(0*x), int(1*y)]])
+    
 
     mask = np.zeros_like(image)
 
@@ -120,21 +133,6 @@ def roi(image): # ROI 셋팅1 (영역 2개)
 
     return masked_image
 
-def region_of_interest(img, vertices, color3=(255,255,255), color1=255): # ROI 셋팅2 (영역 1개)
-
-    mask = np.zeros_like(img) # mask = img와 같은 크기의 빈 이미지
-    
-    if len(img.shape) > 2: # Color 이미지(3채널)라면 :
-        color = color3
-    else: # 흑백 이미지(1채널)라면 :
-        color = color1
-        
-    # vertices에 정한 점들로 이뤄진 다각형부분(ROI 설정부분)을 color로 채움 
-    cv2.fillPoly(mask, vertices, color)
-    
-    # 이미지와 color로 채워진 ROI를 합침
-    ROI_image = cv2.bitwise_and(img, mask)
-    return ROI_image
 
 def draw_lines(img, lines, color=[0, 0, 255], thickness=5): # 선 그리기
     for line in lines:
@@ -298,3 +296,27 @@ def select_representative_line(lines, image_center_x):
     # Select the longer line
     representative_line = closest_lines[np.argmax(lengths)]
     return representative_line
+
+
+
+
+##############################
+# 기울기를 계산하는 함수
+def calculate_slope(line):
+    x1, y1, x2, y2 = line
+    # x1 = line[0]
+    # y1 = line[1]
+    # x2 = line[2]
+    # y2 = line[3]
+    
+    return (y2 - y1) / (x2 - x1)
+
+def calculate_line_equation(line):
+    x1, y1, x2, y2 = line
+    slope = (y2 - y1) / (x2 - x1 + 1e-6)  # Avoid division by zero
+    intercept = y1 - slope * x1
+    return slope, intercept
+
+def calculate_x_at_y(slope, intercept, y):
+    x = (y - intercept) / (slope + 1e-6)  # Avoid division by zero
+    return x

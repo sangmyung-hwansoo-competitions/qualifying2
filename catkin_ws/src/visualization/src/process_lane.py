@@ -53,6 +53,22 @@ def apply_binarization(image, threshold=128):
     _, binary_image = cv2.threshold(gray_image, threshold, 255, cv2.THRESH_BINARY)
     return cv2.cvtColor(binary_image, cv2.COLOR_GRAY2BGR)
 
+# 이진화 적용 함수 (feat RGB)
+def apply_binarization_RGB(image, threshold=128):
+    # 임계값을 적용한 각 채널의 이진화
+    _, binary_R = cv2.threshold(image[:, :, 2], threshold, 255, cv2.THRESH_BINARY)
+    _, binary_G = cv2.threshold(image[:, :, 1], threshold, 255, cv2.THRESH_BINARY)
+    _, binary_B = cv2.threshold(image[:, :, 0], threshold, 255, cv2.THRESH_BINARY)
+
+    # 모든 채널이 임계값 이상인 경우에만 흰색
+    binary_image = np.where((binary_R == 255) & (binary_G == 255) & (binary_B == 255), 255, 0).astype(np.uint8)
+    
+    # 3채널 이미지로 변환
+    binary_image = cv2.merge([binary_image, binary_image, binary_image])
+    
+    return binary_image
+
+
 # # 5단계 밝기 양자화 적용 함수
 # def apply_brightness_quantization(image, levels=5):
 #     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -99,17 +115,31 @@ def roi(image): # ROI 셋팅1 (영역 2개)
 
     # 한 붓 그리기
     # https://moon-coco.tistory.com/entry/OpenCV%EC%B0%A8%EC%84%A0-%EC%9D%B8%EC%8B%9D
-    _shape = np.array(
+    # _shape = np.array(
         
-        [[int(0*x), int(1*y)], 
-         [int(0*x), int(0.1*y)], 
-         [int(0.3*x), int(0.1*y)], 
-         [int(0.3*x), int(1*y)], 
-         [int(0.6*x), int(1*y)], 
-         [int(0.6*x), int(0.1*y)],
-         [int(0.99*x), int(0.1*y)], 
-         [int(0.99*x), int(1*y)], 
-         [int(0*x), int(1*y)]])
+    #     [[int(0*x), int(1*y)], 
+    #      [int(0*x), int(0.1*y)], 
+    #      [int(0.3*x), int(0.1*y)], 
+    #      [int(0.3*x), int(1*y)], 
+    #      [int(0.6*x), int(1*y)], 
+    #      [int(0.6*x), int(0.1*y)],
+    #      [int(0.99*x), int(0.1*y)], 
+    #      [int(0.99*x), int(1*y)], 
+    #      [int(0*x), int(1*y)]])
+    
+    
+    point1 = (int(0 * x), int(1 * y)) # 왼쪽 차선 좌하단
+    point2 = (int(0 * x), int(0.1 * y)) # 왼쪽 차선 좌상단
+    point3 = (int(0.3 * x), int(0.1 * y)) # 왼쪽 차선 우상단
+    point4 = (int(0.3 * x), int(1 * y)) # 왼쪽 차선 우하단
+    
+    point5 = (int(0.6 * x), int(1 * y)) # 오른쪽 차선 좌하단
+    point6 = (int(0.53 * x), int(0.1 * y)) # 오른쪽 차선 좌상단
+    point7 = (int(0.67 * x), int(0.1 * y)) # 오른쪽 차선 우상단
+    point8 = (int(0.99 * x), int(1 * y)) # 오른쪽 차선 우하단
+    point9 = (int(0 * x), int(1 * y))
+
+    _shape = np.array([point1, point2, point3, point4, point5, point6, point7, point8, point9])
 
     mask = np.zeros_like(image)
 
@@ -123,6 +153,65 @@ def roi(image): # ROI 셋팅1 (영역 2개)
     masked_image = cv2.bitwise_and(image, mask)
 
     return masked_image
+
+
+
+def roi_with_overlay(image):  # ROI 셋팅1 (영역 2개)와 투명도 오버레이
+    x = int(image.shape[1]) #800
+    y = int(image.shape[0]) #600
+
+    # 각 점을 변수로 정의
+    point1 = (int(0 * x), int(1 * y)) # 왼쪽 차선 좌하단
+    point2 = (int(0 * x), int(0.1 * y)) # 왼쪽 차선 좌상단
+    point3 = (int(0.3 * x), int(0.1 * y)) # 왼쪽 차선 우상단
+    point4 = (int(0.3 * x), int(1 * y)) # 왼쪽 차선 우하단
+    
+    point5 = (int(0.6 * x), int(1 * y)) # 오른쪽 차선 좌하단
+    point6 = (int(0.53 * x), int(0.1 * y)) # 오른쪽 차선 좌상단
+    point7 = (int(0.67 * x), int(0.1 * y)) # 오른쪽 차선 우상단
+    point8 = (int(0.99 * x), int(1 * y)) # 오른쪽 차선 우하단
+    point9 = (int(0 * x), int(1 * y))
+
+    _shape = np.array([point1, point2, point3, point4, point5, point6, point7, point8, point9])
+    
+    # 각 점을 색깔별로 표시
+    red = (255, 0, 0)
+    green = (0, 255, 0)
+    blue = (0, 0, 255)
+    yellow = (255, 255, 0)
+    magenta = (255, 0, 255)
+    cyan = (0, 255, 255)
+    purple = (128, 0, 128)
+    teal = (0, 128, 128)
+    olive = (128, 128, 0)
+
+    colors = [red, green, blue, yellow, magenta, cyan, purple, teal, olive]
+    points = [point1, point2, point3, point4, point5, point6, point7, point8, point9]
+
+    mask = np.zeros_like(image)
+    
+    if len(image.shape) > 2:
+        channel_count = image.shape[2]
+        ignore_mask_color = (255,) * channel_count
+    else:
+        ignore_mask_color = 255
+
+    cv2.fillPoly(mask, np.int32([_shape]), ignore_mask_color)
+
+    # 투명도 설정
+    alpha = 0.4  # 투명도 값 (0.0 - 1.0)
+    mask_overlay = cv2.addWeighted(image, alpha, mask, 1 - alpha, 0)
+    
+    # ROI 이미지 생성
+    masked_image = cv2.bitwise_and(image, mask)
+
+    for idx, point in enumerate(points):
+        color = colors[idx]
+        cv2.circle(mask_overlay, point, 5, color, -1)
+
+    # 투명도 오버레이된 이미지 반환
+    return mask_overlay
+
 
 def region_of_interest(img, vertices, color3=(255,255,255), color1=255): # ROI 셋팅2 (영역 1개)
 
@@ -191,7 +280,6 @@ def draw_fit_line(img, lines, color=[255, 0, 0], thickness=5): # 대표선 그�
         cv2.line(img, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
 ########################################################################3
-# RANSAC을 이용한 선형 회귀
 # RANSAC을 이용한 선형 회귀
 def fit_line_ransac(x, y, min_samples=2):
     if len(x) < min_samples or len(y) < min_samples:
@@ -273,6 +361,10 @@ left_line_data = LineData()
 right_line_data = LineData()
 
 ##########################################################3
+# 기울기를 계산하는 함수
+def calculate_slope(line):
+    x1, y1, x2, y2 = line.reshape(4)
+    return (y2 - y1) / (x2 - x1)
 
 def calculate_distance_from_center(line, image_center_x):
     x1, y1, x2, y2 = line
@@ -327,8 +419,16 @@ with rosbag.Bag(input_bag_path, 'r') as input_bag:
         
         processed_image = adjust_brightness_contrast(processed_image, brightness=-30, contrast=30)
         processed_image = apply_clahe(processed_image)
-        processed_image = adjust_gamma(processed_image, gamma=1.2)
+        processed_image = adjust_gamma(processed_image, gamma=0.8)
+        #####################33
+        # processed_image = apply_binarization_RGB(processed_image, threshold=180)
         
+        # gray_img = grayscale(processed_image) # 흑백이미지로 변환
+    
+        # blur_img = gaussian_blur(gray_img, 5) # Blur 효과
+                
+        # processed_image = canny(blur_img, 30, 210) # Canny edge 알고리즘
+        #######################3
         
         gray_img = grayscale(processed_image) # 흑백이미지로 변환
     
@@ -336,7 +436,7 @@ with rosbag.Bag(input_bag_path, 'r') as input_bag:
                 
         canny_img = canny(blur_img, 30, 210) # Canny edge 알고리즘
         
-        # 에지 두께 증가
+        #에지 두께 증가
         #canny_img = cv2.dilate(canny_img, np.ones((3, 3), np.uint8), iterations=1)
 
         
@@ -393,14 +493,29 @@ with rosbag.Bag(input_bag_path, 'r') as input_bag:
             representative_right_line = select_representative_line(R_lines, width / 2)
             
             # 이전 프레임의 대표선과 비교했을때, 하단의 x 좌표가 임계값 이상 차이날 시 이전 프레임의 대표선을 채택
-            x_threshold = 70
+            x_threshold_max = 50
             if representative_left_line is not None and previous_left_line is not None:
-                if abs(representative_left_line[0][0] - previous_left_line[0][0]) > x_threshold:
+                if abs(representative_left_line[0][0] - previous_left_line[0][0]) > x_threshold_max:
                     representative_left_line = previous_left_line
 
             if representative_right_line is not None and previous_right_line is not None:
-                if abs(representative_right_line[0][0] - previous_right_line[0][0]) > x_threshold:
+                if abs(representative_right_line[0][0] - previous_right_line[0][0]) > x_threshold_max:
                     representative_right_line = previous_right_line
+            
+            # 이전 프레임의 대표선과 비교했을 때, 기울기가 임계값 이하 차이날 시 이전 프레임의 대표선을 채택
+            slope_threshold = 0.1  # 임계값 설정
+            if representative_left_line is not None and previous_left_line is not None:
+                current_slope_left = calculate_slope(representative_left_line)
+                previous_slope_left = calculate_slope(previous_left_line)
+                if abs(current_slope_left - previous_slope_left) < slope_threshold:
+                    representative_left_line = previous_left_line
+
+            if representative_right_line is not None and previous_right_line is not None:
+                current_slope_right = calculate_slope(representative_right_line)
+                previous_slope_right = calculate_slope(previous_right_line)
+                if abs(current_slope_right - previous_slope_right) < slope_threshold:
+                    representative_right_line = previous_right_line   
+            
      
              # 검출된 직선이 없는 경우: 이전 프레임의 직선을 대표선으로 채택
             if representative_left_line is None and previous_left_line is not None:
@@ -419,52 +534,55 @@ with rosbag.Bag(input_bag_path, 'r') as input_bag:
 
      
      
-            '''
-            # RANSAC을 사용하여 부드러운 직선 그리기
-            draw_lane_lines_ransac(temp, L_lines, color=[0, 0, 255])
-            draw_lane_lines_ransac(temp, R_lines, color=[0, 255, 0])
-            '''
+            ################################333
+            # # RANSAC을 사용하여 부드러운 직선 그리기
+            # draw_lane_lines_ransac(temp, L_lines, color=[0, 0, 255])
+            # draw_lane_lines_ransac(temp, R_lines, color=[0, 255, 0])
+
             
-            # # 왼쪽, 오른쪽 각각 대표선 구하기
-            # left_fit_line = get_fitline(canny_img,L_lines)
-            # right_fit_line = get_fitline(canny_img,R_lines)
-            # # 대표선 그리기
-            # draw_fit_line(temp, left_fit_line)
-            # draw_fit_line(temp, right_fit_line)
+            # # # 왼쪽, 오른쪽 각각 대표선 구하기
+            # # left_fit_line = get_fitline(canny_img,L_lines)
+            # # right_fit_line = get_fitline(canny_img,R_lines)
+            # # # 대표선 그리기
+            # # draw_fit_line(temp, left_fit_line)
+            # # draw_fit_line(temp, right_fit_line)
             
             
+
+            # # RANSAC을 사용하여 부드러운 직선 검출 & 무빙 윈도우
+            # left_line = fit_line_ransac(np.array(L_lines[:, :, 0:1]).flatten(), np.array(L_lines[:, :, 1:2]).flatten())
+            # right_line = fit_line_ransac(np.array(R_lines[:, :, 0:1]).flatten(), np.array(R_lines[:, :, 1:2]).flatten())
             
-            '''
-            # RANSAC을 사용하여 부드러운 직선 검출 & 무빙 윈도우
-            left_line = fit_line_ransac(np.array(L_lines[:, :, 0:1]).flatten(), np.array(L_lines[:, :, 1:2]).flatten())
-            right_line = fit_line_ransac(np.array(R_lines[:, :, 0:1]).flatten(), np.array(R_lines[:, :, 1:2]).flatten())
-            
-            if left_line:
-                left_line_data.add_data(left_line)
-                left_line_avg = left_line_data.get_median()
-                left_line_points = make_line_points(height, int(height * 0.4), left_line_avg)
-                if left_line_points:
-                    cv2.line(temp, left_line_points[0], left_line_points[1], [0, 0, 255], 5)
+            # if left_line:
+            #     left_line_data.add_data(left_line)
+            #     left_line_avg = left_line_data.get_median()
+            #     left_line_points = make_line_points(height, int(height * 0.4), left_line_avg)
+            #     if left_line_points:
+            #         cv2.line(temp, left_line_points[0], left_line_points[1], [0, 0, 255], 5)
                     
-            if right_line:
-                right_line_data.add_data(right_line)
-                right_line_avg = right_line_data.get_median()
-                right_line_points = make_line_points(height, int(height * 0.4), right_line_avg)
-                if right_line_points:
-                    cv2.line(temp, right_line_points[0], right_line_points[1], [0, 255, 0], 5)
-            '''
+            # if right_line:
+            #     right_line_data.add_data(right_line)
+            #     right_line_avg = right_line_data.get_median()
+            #     right_line_points = make_line_points(height, int(height * 0.4), right_line_avg)
+            #     if right_line_points:
+            #         cv2.line(temp, right_line_points[0], right_line_points[1], [0, 255, 0], 5)
+            ############################3
+
             
-                 
+            
             
                         
 
             processed_image = weighted_img(temp, cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR))  # 원본 이미지에 검출된 선 overlap
+            processed_image = roi_with_overlay(processed_image)
         else:
             processed_image = cv_image  # 직선이 검출되지 않으면 원본 이미지 사용
+        
         
         cv2.imshow('result', processed_image) # 결과 이미지 출력
         if cv2.waitKey(1) & 0xFF == ord('q'):
            break
+        
 
         ###################시각화########################
         # # 첫 번째 프레임을 시각화하고 특정 키 입력 대기 (RGB)

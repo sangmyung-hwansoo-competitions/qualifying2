@@ -13,14 +13,28 @@ bridge = CvBridge()
 # ROS Publisher for the processed image
 image_pub = None
 
-
+coord_pub = None
 
 # 직선 데이터 저장용 변수
 previous_left_line = None
 previous_right_line = None
 
 
+class MovingAverageFilter:
+    def __init__(self, window_size):
+        self.window_size = window_size
+        self.data = []
 
+    def add_data(self, value):
+        if len(self.data) >= self.window_size:
+            self.data.pop(0)
+        self.data.append(value)
+        return self.get_average()
+
+    def get_average(self):
+        if not self.data:
+            return None
+        return sum(self.data) / len(self.data)
 
 
 # Callback function for the image subscriber
@@ -91,6 +105,21 @@ def image_callback(msg):
             if representative_right_line is not None and previous_right_line is not None:
                 if abs(representative_right_line[0][0] - previous_right_line[0][0]) > x_threshold:
                     representative_right_line = previous_right_line
+                    
+                    
+            # 이전 프레임의 대표선과 비교했을 때, 기울기가 임계값 이하 차이날 시 이전 프레임의 대표선을 채택
+            slope_threshold = 0.1  # 임계값 설정
+            if representative_left_line is not None and previous_left_line is not None:
+                current_slope_left = calculate_slope(representative_left_line.reshape(-1))
+                previous_slope_left = calculate_slope(previous_left_line.reshape(-1))
+                if abs(current_slope_left - previous_slope_left) < slope_threshold:
+                    representative_left_line = previous_left_line
+
+            if representative_right_line is not None and previous_right_line is not None:
+                current_slope_right = calculate_slope(representative_right_line.reshape(-1))
+                previous_slope_right = calculate_slope(previous_right_line.reshape(-1))
+                if abs(current_slope_right - previous_slope_right) < slope_threshold:
+                    representative_right_line = previous_right_line
      
              # 검출된 직선이 없는 경우: 이전 프레임의 직선을 대표선으로 채택
             if representative_left_line is None and previous_left_line is not None:
@@ -104,8 +133,40 @@ def image_callback(msg):
                 previous_left_line = representative_left_line  # 업데이트
             if representative_right_line is not None:
                 draw_lines(temp, [representative_right_line], color=[0, 255, 0])
-                previous_right_line = representative_right_line  # 업데이트    
-     
+                previous_right_line = representative_right_line  # 업데이트      
+            
+            
+            # 중앙점
+            x_filter = MovingAverageFilter(window_size=40)
+            y_filter = MovingAverageFilter(window_size=50)
+            
+            # f_data = np.append(representative_left_line, representative_right_line)
+            # # ex: [ 18 350 186  60 480 102 519 328]
+            # f_data = [float(inp) for inp in f_data]
+            # # ex: [18.0, 350.0, 186.0, 60.0, 480.0, 102.0, 519.0, 328.0]
+            
+            # x1l, y1l, x2l, y2l, x1r, y1r, x2r, y2r = f_data
+            # center_coord = ((x1l + x2l + x1r + x2r) / 4, (y1l + y2l + y1r + y2r) / 4)
+            
+            
+            y=300
+            slope_left, intercept_left = calculate_line_equation(representative_left_line.reshape(-1))
+            slope_right, intercept_right = calculate_line_equation(representative_right_line.reshape(-1))
+            
+            x_left = calculate_x_at_y(slope_left, intercept_left, y)
+            x_right = calculate_x_at_y(slope_right, intercept_right, y)
+            
+            center_coord = ((x_left + x_right) / 2, y)
+            
+            
+            
+            # Smooth the coordinates using the filters
+            smoothed_x = int(x_filter.add_data(center_coord[0]))
+            smoothed_y = int(y_filter.add_data(center_coord[1]))
+            
+            if smoothed_x is not None and smoothed_y is not None:
+                cv2.circle(temp, (smoothed_x, smoothed_y), radius=10, color=(0, 255, 0), thickness=-1)  
+            
             
             processed_image = weighted_img(temp, cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR))  # 원본 이미지에 검출된 선 overlap
         else:
