@@ -304,6 +304,11 @@ def select_representative_line(lines, image_center_x):
     return representative_line
 
 #########################################################
+# 직선 데이터 저장용 변수
+previous_left_line = None
+previous_right_line = None
+
+
 # 새로운 bag 파일을 열기
 output_bag = rosbag.Bag(output_bag_path, 'w')
 
@@ -356,39 +361,62 @@ with rosbag.Bag(input_bag_path, 'r') as input_bag:
         line_arr = hough_lines(ROI_img, 1, 1 * np.pi/180, 20, 150, 15) # 허프 변환
         
         
-        if line_arr is not None:
+        if line_arr is not None and len(line_arr) > 0:
             temp = np.zeros((cv_image.shape[0], cv_image.shape[1], 3), dtype=np.uint8)
             ########################draw_lines(temp, line_arr)  # 검출된 모든 직선 그리기
+            if len(line_arr.shape) == 1:
+                line_arr = np.expand_dims(line_arr, axis=0)
             line_arr = np.squeeze(line_arr)
-            
-            # #print(line_arr)
+
             # 기울기 구하기
             slope_degree = (np.arctan2(line_arr[:, 1] - line_arr[:, 3], line_arr[:, 0] - line_arr[:, 2]) * 180) / np.pi
 
             # 수평 기울기 제한
-            line_arr = line_arr[np.abs(slope_degree) < 170]
-            slope_degree = slope_degree[np.abs(slope_degree) < 170]
+            line_arr = line_arr[np.abs(slope_degree) < 140]
+            slope_degree = slope_degree[np.abs(slope_degree) < 140]
             # 수직 기울기 제한
-            line_arr = line_arr[np.abs(slope_degree) > 95]
-            slope_degree = slope_degree[np.abs(slope_degree) > 95]
+            line_arr = line_arr[np.abs(slope_degree) > 97]
+            slope_degree = slope_degree[np.abs(slope_degree) > 97]
             # 필터링된 직선 버리기
             L_lines, R_lines = line_arr[(slope_degree > 0), :], line_arr[(slope_degree < 0), :]
             temp = np.zeros((cv_image.shape[0], cv_image.shape[1], 3), dtype=np.uint8)
             L_lines, R_lines = L_lines[:, None], R_lines[:, None]
-            # 직선 그리기
-            # draw_lines(temp, L_lines, color=[0, 0, 255])
-            # draw_lines(temp, R_lines, color=[0, 255, 0])
+
+            # 검출된 직선이 1개인 경우: 한 프레임 이전 직선 추가해서 검출 직선 2개로 고정
+            if len(L_lines) == 1 and previous_left_line is not None:
+                L_lines = np.append(L_lines, [previous_left_line], axis=0)
+            if len(R_lines) == 1 and previous_right_line is not None:
+                R_lines = np.append(R_lines, [previous_right_line], axis=0)
             
-            # 중앙에서 가장 가까운 직선 2개 중에서 더 긴 직선 선택
+            # 중앙에서 가장 가까운 직선 2개 중에서 더 긴 직선 대표선으로 선택
             representative_left_line = select_representative_line(L_lines, width / 2)
             representative_right_line = select_representative_line(R_lines, width / 2)
+            
+            # 이전 프레임의 대표선과 비교했을때, 하단의 x 좌표가 임계값 이상 차이날 시 이전 프레임의 대표선을 채택
+            x_threshold = 70
+            if representative_left_line is not None and previous_left_line is not None:
+                if abs(representative_left_line[0][0] - previous_left_line[0][0]) > x_threshold:
+                    representative_left_line = previous_left_line
 
+            if representative_right_line is not None and previous_right_line is not None:
+                if abs(representative_right_line[0][0] - previous_right_line[0][0]) > x_threshold:
+                    representative_right_line = previous_right_line
+     
+             # 검출된 직선이 없는 경우: 이전 프레임의 직선을 대표선으로 채택
+            if representative_left_line is None and previous_left_line is not None:
+                representative_left_line = previous_left_line
+            if representative_right_line is None and previous_right_line is not None:
+                representative_right_line = previous_right_line
+            
             # 직선 그리기
             if representative_left_line is not None:
                 draw_lines(temp, [representative_left_line], color=[0, 0, 255])
-            
+                previous_left_line = representative_left_line  # 업데이트
             if representative_right_line is not None:
                 draw_lines(temp, [representative_right_line], color=[0, 255, 0])
+                previous_right_line = representative_right_line  # 업데이트    
+     
+
      
      
             '''
