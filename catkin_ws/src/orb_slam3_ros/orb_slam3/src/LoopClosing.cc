@@ -537,10 +537,15 @@ bool LoopClosing::DetectAndReffineSim3FromLastKF(KeyFrame* pCurrentKF, KeyFrame*
 {
     set<MapPoint*> spAlreadyMatchedMPs;
     nNumProjMatches = FindMatchesByProjection(pCurrentKF, pMatchedKF, gScw, spAlreadyMatchedMPs, vpMPs, vpMatchedMPs);
-
+    ////////////////////////////////////////////////////////////////////////////////////
     int nProjMatches = 30;
     int nProjOptMatches = 50;
     int nProjMatchesRep = 100;
+    // int nProjMatches = 2500;
+    // int nProjOptMatches = 3000;
+    // int nProjMatchesRep = 100;
+    ////////////////////////////////////////////////////////////////////////////////////   
+
 
     if(nNumProjMatches >= nProjMatches)
     {
@@ -995,7 +1000,10 @@ void LoopClosing::CorrectLoop()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         usleep(1000);
+        //usleep(10);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     // Ensure current keyframe is updated
@@ -1249,7 +1257,10 @@ void LoopClosing::MergeLocal()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         usleep(1000);
+        //usleep(10);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
     //cout << "Local Map stopped" << endl;
 
@@ -1708,7 +1719,10 @@ void LoopClosing::MergeLocal()
         // Wait until Local Mapping has effectively stopped
         while(!mpLocalMapper->isStopped())
         {
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             usleep(1000);
+            //usleep(10);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         // Optimize graph (and update the loop position for each element form the begining to the end)
@@ -1822,7 +1836,10 @@ void LoopClosing::MergeLocal2()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         usleep(1000);
+        //usleep(10);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
     //cout << "Local Map stopped" << endl;
 
@@ -2322,7 +2339,10 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
 
             while(!mpLocalMapper->isStopped() && !mpLocalMapper->isFinished())
             {
-                usleep(1000);
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //usleep(1000);
+                usleep(10);
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             }
 
             // Get Map Mutex

@@ -156,7 +156,8 @@ class World(object):
         except RuntimeError as error:
             sys.exit(1)
         self.player = None
-        self.rule_sensor = None
+        ##########################################33
+        #self.rule_sensor = None
         self.imu_sensor = None
         self.camera_manager = None
         self._weather_presets = find_weather_presets()
@@ -182,6 +183,8 @@ class World(object):
     def restart(self):
         self.player_max_speed = 1.589
         self.player_max_speed_fast = 3.713
+        # self.player_max_speed = 0.5
+        # self.player_max_speed_fast = 0.7
         # Keep same camera config if the camera manager exists.
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
@@ -220,7 +223,8 @@ class World(object):
             spawn_points = self.map.get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
-        self.rule_sensor = RuleSensor(self.player)
+        #######################################################    
+        #self.rule_sensor = RuleSensor(self.player)
         self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.Mdim, self._gamma)
         self.camera_manager.transform_index = cam_pos_index
@@ -245,10 +249,13 @@ class World(object):
         self.camera_manager.index = None
 
     def destroy(self):
+        # sensors = [
+        #     self.camera_manager.sensor,
+        #     self.imu_sensor.sensor,
+        #     self.rule_sensor.sensor]
         sensors = [
             self.camera_manager.sensor,
-            self.imu_sensor.sensor,
-            self.rule_sensor.sensor]
+            self.imu_sensor.sensor]
         for sensor in sensors:
             if sensor is not None:
                 sensor.stop()
@@ -307,7 +314,8 @@ class KeyboardControl(object):
                         world.player.disable_constant_velocity()
                         world.constant_velocity_enabled = False
                     else:
-                        world.player.enable_constant_velocity(carla.Vector3D(17, 0, 0))
+                        world.player.enable_constant_velocity(carla.Vector3D(10, 0, 0)) # 60km/h
+                        #world.player.enable_constant_velocity(carla.Vector3D(4, 0, 0)) #3.5 괜찮았었음
                         world.constant_velocity_enabled = True
                 elif event.key > K_0 and event.key <= K_9:
                     world.camera_manager.set_sensor(event.key - 1 - K_0)
@@ -676,7 +684,7 @@ def main():
     argparser.add_argument(
         '--host',
         metavar='H',
-        default='127.0.0.1',
+        default='172.22.160.1',
         help='IP of the host server (default: 127.0.0.1)')
     argparser.add_argument(
         '-p', '--port',

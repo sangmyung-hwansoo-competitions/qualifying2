@@ -1,7 +1,9 @@
 <launch>
-    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data.bag" />
+    <!-- <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data.bag" /> -->
+    <arg name="bag_file" default="$(find integration)/bag/usb_cam_recorded_data_process_cut.bag" />
     <arg name="loop" default="true" />
-    <arg name="rate" default="1.0" />
+    <arg name="rate" default="0.5" />
+    <!-- <arg name="rate" default="0.5" />  -->
 
     <!-- ROS BAG REPLAY -->
     <group if="$(arg loop)">

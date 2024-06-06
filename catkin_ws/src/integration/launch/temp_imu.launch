@@ -1,0 +1,50 @@
+<launch>
+    <!-- Arguments for bag files -->
+    <arg name="cam_bag_file" default="$(find integration)/bag/usb_cam_recorded_data_con.bag" />
+    <arg name="imu_bag_file" default="$(find integration)/bag/imu_recorded_data_con.bag" />
+    <arg name="loop" default="true" />
+    <arg name="rate" default="1.0" />
+
+    <!-- ROS BAG REPLAY -->
+    <group if="$(arg loop)">
+        <!-- Replay camera bag file with loop -->
+        <node pkg="rosbag" type="play" name="play_cam_bag_with_loop" args="$(arg cam_bag_file) --loop --rate=$(arg rate)" output="screen" />
+        <!-- Replay IMU bag file with loop -->
+        <node pkg="rosbag" type="play" name="play_imu_bag_with_loop" args="$(arg imu_bag_file) --loop --rate=$(arg rate)" output="screen" />
+    </group>
+    
+    <group unless="$(arg loop)">
+        <!-- Replay camera bag file without loop -->
+        <node pkg="rosbag" type="play" name="play_cam_bag_without_loop" args="$(arg cam_bag_file) --rate=$(arg rate)" output="screen" />
+        <!-- Replay IMU bag file without loop -->
+        <node pkg="rosbag" type="play" name="play_imu_bag_without_loop" args="$(arg imu_bag_file) --rate=$(arg rate)" output="screen" />
+    </group>
+
+    <!-- ORB SLAM3 -->
+    <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono_inertial" output="screen">
+        <!-- change the topics according to the dataset -->
+        <remap from="/camera/image_raw"    to="/usb_cam/image_raw"/>
+        <remap from="/imu"                  to="/imu"/>
+
+        <!-- Parameters for original ORB-SLAM3 -->
+        <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
+        <param name="settings_file" type="string" value="$(find orb_slam3_ros)/config/Monocular-Inertial/EuRoC.yaml"/>
+
+        <!-- Parameters for ROS -->
+        <param name="world_frame_id"    type="string"   value="world" />
+        <param name="cam_frame_id"      type="string"   value="camera" />
+        <param name="imu_frame_id"      type="string"   value="imu" />
+        <param name="enable_pangolin"   type="bool"     value="false" />
+    </node>
+
+    <!-- Visualization -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/orb_slam3_with_imu.rviz" output="screen" />
+
+    <!-- Trajectory path -->
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
+        <param name="/target_frame_name" value="/world" />
+        <param name="/source_frame_name" value="/imu" />
+        <param name="/trajectory_update_rate" value="20.0" />
+        <param name="/trajectory_publish_rate" value="20.0" />
+    </node>
+</launch>

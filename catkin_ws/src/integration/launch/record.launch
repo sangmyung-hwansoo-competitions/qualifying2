@@ -20,9 +20,17 @@
         <param name="port" value="$(arg port)" />
     </node>
 
+    <!-- <node pkg="control" type="teleop_keyboard_rule.py" name="control_keyboard" output="screen"  -->
+    <!-- <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen"  -->
     <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen" 
         args="--host $(arg host) --port $(arg port) --res '960x640'" />
-
+    
+    <!-- USB 카메라 데이터를 별도의 bag 파일에 저장 -->
     <node pkg="rosbag" type="record" name="rosbag_record" output="screen"
         args="-O $(find integration)/bag/usb_cam_recorded_data.bag /usb_cam/image_raw" />
+    
+    <!-- IMU 데이터를 별도의 bag 파일에 저장 -->
+    <node pkg="rosbag" type="record" name="rosbag_record_imu" output="screen"
+        args="-O $(find integration)/bag/imu_recorded_data4.bag /imu" />
+
 </launch>
