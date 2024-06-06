@@ -276,3 +276,42 @@ def select_representative_line(lines, image_center_x):
     # Select the longer line
     representative_line = closest_lines[np.argmax(lengths)]
     return representative_line
+
+def calculate_x_at_y(y_target, line_coords):
+    x1, y1, x2, y2 = line_coords[0]
+    if x2 == x1:  # Avoid division by zero for vertical lines
+        return x1
+    m = (y2 - y1) / (x2 - x1)
+    b = y1 - m * x1
+    x_at_y = (y_target - b) / m
+    return x_at_y
+
+def filter_image_by_hsl(image, lower_bound1, upper_bound1, lower_bound2, upper_bound2, lower_bound3, upper_bound3):
+    
+    # 첫 번째 색상 범위에 해당하는 마스크 생성
+    mask1 = cv2.inRange(image, np.array(lower_bound1), np.array(upper_bound1))
+
+    # 두 번째 색상 범위에 해당하는 마스크 생성
+    mask2 = cv2.inRange(image, np.array(lower_bound2), np.array(upper_bound2))
+
+    mask3 = cv2.inRange(image, np.array(lower_bound3), np.array(upper_bound3))
+
+    # 두 마스크 결합
+    combined_mask = cv2.bitwise_or(mask1, mask2)
+
+    combined_mask = cv2.bitwise_or(combined_mask, mask3)
+
+    # 원본 이미지와 결합된 마스크를 사용하여 결과 이미지 생성
+    result_image = cv2.bitwise_and(image, image, mask=combined_mask)
+
+    return result_image
+
+
+def calculate_slope(line):
+    x1, y1, x2, y2 = line
+    # x1 = line[0]
+    # y1 = line[1]
+    # x2 = line[2]
+    # y2 = line[3]
+    
+    return (y2 - y1) / (x2 - x1)

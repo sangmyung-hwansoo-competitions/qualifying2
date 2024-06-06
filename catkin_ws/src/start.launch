@@ -1,4 +1,5 @@
 <launch>
+    <!-- <include file="/home/divinetech/env.launch"/> -->
     <arg name="host" default="$(env HOSTIP)" />
     <arg name="port" default="2000" />
     <arg name="res" default="640x480" />
@@ -6,10 +7,15 @@
     <arg name="camera_sensor_x" default="0.0" />
     <arg name="camera_sensor_y" default="0.0" />
     <arg name="camera_sensor_z" default="2.5" />
+
+    <!-- <arg name="camera_sensor_x" default="0.0" />
+    <arg name="camera_sensor_y" default="1.0" />
+    <arg name="camera_sensor_z" default="1.5" /> -->
+
     <arg name="lidar_sensor_x" default="0.0" />
     <arg name="lidar_sensor_y" default="0.0" />
     <arg name="lidar_sensor_z" default="2.5" />
-    <arg name="_rule_sensor_on" default="1" />
+    <arg name="_rule_sensor_on" default="0" />
     <arg name="gamma" default="2.2" />
 
     <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
@@ -27,9 +33,10 @@
     <node pkg="control" type="teleop_keyboard.py" name="control_keyboard" output="screen" 
         args="--host $(arg host) --port $(arg port) --gamma $(arg gamma) --res $(arg res)" />
 
-	<!-- <node pkg="perception" type="sig_sync.py" name="sync_listener" output="screen"/> -->
 	<node pkg="perception" type="start_signal.py" name="start_signal" output="screen"/>
-	<node pkg="perception" type="lane_detection.py" name="lane_detector" output="screen"/>
+	<node pkg="perception" type="image_pre_processor.py" name="image_pre_processor" output="screen"/>
+	<node pkg="perception" type="lane_detector.py" name="lane_detector" output="screen"/>
+
 	<node pkg="control" type="lane_keeping_control.py" name="lane_keeping" output="screen"/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/start.rviz" output="screen" />
