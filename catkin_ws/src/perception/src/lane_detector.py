@@ -41,7 +41,7 @@ class LaneDetector:
 
             ROI_img = roi(canny_img) # ROI 설정
 
-            line_arr = hough_lines(ROI_img, 1, 1 * np.pi/180, 35, 120, 60) # 허프 변환
+            line_arr = hough_lines(ROI_img, 1, 1 * np.pi/180, 45, 120, 60) # 허프 변환
 
             if line_arr is not None:
                 temp = np.zeros((canny_img.shape[0], canny_img.shape[1], 3), dtype=np.uint8)
@@ -110,7 +110,7 @@ class LaneDetector:
                     draw_lines(temp, [representative_right_line], color=[0, 255, 0])
                     self.previous_right_line = representative_right_line  # 업데이트  
 
-                y_target = 325
+                y_target = 185
                 x_left_at_y = calculate_x_at_y(y_target, representative_left_line)
                 x_right_at_y = calculate_x_at_y(y_target, representative_right_line)
                 
@@ -122,8 +122,8 @@ class LaneDetector:
                 smoothed_x = int((smoothed_lx + smoothed_rx)/2)
 
                 if smoothed_lx is not None and smoothed_rx is not None:
-                    cv2.circle(temp, (smoothed_x, 325), radius=10, color=(0, 255, 0), thickness=-1)
-                    cv2.circle(temp, (400, 325), radius=10, color=(0, 0, 255), thickness=-1)
+                    cv2.circle(temp, (smoothed_x, y_target), radius=10, color=(0, 255, 0), thickness=-1)
+                    cv2.circle(temp, (400, y_target), radius=10, color=(0, 0, 255), thickness=-1)
 
                 processed_image = weighted_img(temp, cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR))  # 원본 이미지에 검출된 선 overlap
 

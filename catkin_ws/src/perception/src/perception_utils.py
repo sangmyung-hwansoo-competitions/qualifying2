@@ -99,14 +99,14 @@ def roi(image): # ROI 셋팅1 (영역 2개)
     # https://moon-coco.tistory.com/entry/OpenCV%EC%B0%A8%EC%84%A0-%EC%9D%B8%EC%8B%9D
     _shape = np.array(
         
-        [[int(0*x), int(1*y)], 
-        [int(0*x), int(0.1*y)], 
+        [[int(0.05*x), int(1*y)], 
+        [int(0.05*x), int(0.1*y)], 
         [int(0.4*x), int(0.1*y)], 
         [int(0.4*x), int(1*y)], 
         [int(0.6*x), int(1*y)], 
         [int(0.6*x), int(0.1*y)],
-        [int(1*x), int(0.1*y)], 
-        [int(1*x), int(1*y)]])
+        [int(99.95*x), int(0.1*y)], 
+        [int(99.95*x), int(1*y)]])
 
     mask = np.zeros_like(image)
 
