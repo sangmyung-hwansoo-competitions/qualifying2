@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
-from sklearn.linear_model import RANSACRegressor
+# from sklearn.linear_model import RANSACRegressor
 
 # 샤프닝 필터 커널
 sharpening_kernel = np.array([[-1, -1, -1],
@@ -100,14 +100,13 @@ def roi(image): # ROI 셋팅1 (영역 2개)
     _shape = np.array(
         
         [[int(0*x), int(1*y)], 
-         [int(0*x), int(0.1*y)], 
-         [int(0.3*x), int(0.1*y)], 
-         [int(0.3*x), int(1*y)], 
-         [int(0.6*x), int(1*y)], 
-         [int(0.6*x), int(0.1*y)],
-         [int(0.99*x), int(0.1*y)], 
-         [int(0.99*x), int(1*y)], 
-         [int(0*x), int(1*y)]])
+        [int(0*x), int(0.1*y)], 
+        [int(0.4*x), int(0.1*y)], 
+        [int(0.4*x), int(1*y)], 
+        [int(0.6*x), int(1*y)], 
+        [int(0.6*x), int(0.1*y)],
+        [int(1*x), int(0.1*y)], 
+        [int(1*x), int(1*y)]])
 
     mask = np.zeros_like(image)
 
@@ -190,16 +189,16 @@ def draw_fit_line(img, lines, color=[255, 0, 0], thickness=5): # 대표선 그�
 
 ########################################################################3
 # RANSAC을 이용한 선형 회귀
-def fit_line_ransac(x, y, min_samples=2):
-    if len(x) < min_samples or len(y) < min_samples:
-        return None
-    ransac = RANSACRegressor(min_samples=min_samples)
-    ransac.fit(x[:, np.newaxis], y)
-    slope = ransac.estimator_.coef_[0]
-    intercept = ransac.estimator_.intercept_
-    if np.isinf(slope) or np.isinf(intercept) or np.isnan(slope) or np.isnan(intercept):
-        return None
-    return slope, intercept
+# def fit_line_ransac(x, y, min_samples=2):
+#     if len(x) < min_samples or len(y) < min_samples:
+#         return None
+#     ransac = RANSACRegressor(min_samples=min_samples)
+#     ransac.fit(x[:, np.newaxis], y)
+#     slope = ransac.estimator_.coef_[0]
+#     intercept = ransac.estimator_.intercept_
+#     if np.isinf(slope) or np.isinf(intercept) or np.isnan(slope) or np.isnan(intercept):
+#         return None
+#     return slope, intercept
 
 def make_line_points(y1, y2, line):
     if line is None:

@@ -77,7 +77,7 @@ class ImagePreProcessor:
 
                 blur_img = gaussian_blur(processed_image, 5) # Blur 효과      
                 gray_img = grayscale(blur_img) # 흑백이미지로 변환
-                canny_img = canny(gray_img, 45, 210) # Canny edge 알고리즘
+                canny_img = canny(gray_img, 35, 200) # Canny edge 알고리즘
 
                 # if self.debug:      
                     # self.roi = cv2.selectROI("Select ROI", cv_image, fromCenter=False, showCrosshair=True)

@@ -20,7 +20,7 @@ class LaneKeepingControl:
         self.coords_sub = rospy.Subscriber("/lane_detector/coords", Point, self.callback)
         self.motor_pub = rospy.Publisher('/xycar_motor', xycar_motor, queue_size=1)
 
-        self.pid = PIDController(0.0012, 0.0000015, 0.0003)
+        self.pid = PIDController(0.0006, 0.000002, 0.0004)
         self.kXycarSteeringAngleLimit = 50
 
         self.c_coords = None
@@ -29,11 +29,11 @@ class LaneKeepingControl:
         self.start_signal = False
         
         self.current_speed = 0.0
-        self.min_speed = 0.3
-        self.max_speed = 0.55
-        
-        self.speed_control_threshold = 0.005
-        self.deceleration_step = 0.01
+        self.min_speed = 0.4
+        self.max_speed = 0.6
+
+        self.speed_control_threshold = 0.0035
+        self.deceleration_step = 0.005
         self.acceleration_step = 0.005
 
     def start_signal_callback(self, msg):
@@ -48,7 +48,7 @@ class LaneKeepingControl:
     def update_control(self):
         error_from_mid = self.c_coords.x - 400
         self.steer_angle = self.calculate_steer_angle(error_from_mid)
-        # self.steer_angle = 0    # 출발 테스트 용
+
         self.speed_control(self.steer_angle)
 
         self.drive(self.steer_angle, self.current_speed)

@@ -17,8 +17,8 @@ class PIDController:
         self.derivative = error_from_mid - self.prev_error
         self.prev_error = error_from_mid
 
-        # if abs(error_from_mid) > 100:
-        #     return 0.3 * error_from_mid + self.Ki * self.integral + self.Kd * self.derivative
+        if abs(error_from_mid) > 90:
+            return 0.0018 * error_from_mid + self.Ki * self.integral + self.Kd * self.derivative
 
         # if abs(error_from_mid) > 120:
         #     return 0.6 * error_from_mid + self.Ki * self.integral + self.Kd * self.derivative

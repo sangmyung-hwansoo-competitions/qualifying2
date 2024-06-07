@@ -1,0 +1,37 @@
+<!-- -->
+<launch>
+    <arg name="host" default="$(env HOSTIP)" />
+    <arg name="port" default="2000" />
+    <arg name="res" default="640x480" />
+
+    <arg name="camera_sensor_x" default="0.0" />
+    <arg name="camera_sensor_y" default="0.0" />
+    <arg name="camera_sensor_z" default="2.5" />
+    <arg name="lidar_sensor_x" default="0.0" />
+    <arg name="lidar_sensor_y" default="0.0" />
+    <arg name="lidar_sensor_z" default="2.5" />
+    <arg name="_rule_sensor_on" default="1" />
+    <arg name="gamma" default="2.2" />
+
+    <node pkg="carla_ctl" type="carla_ctl" name="carla_ctl" output="screen">
+        <param name="camera_sensor_x" value="$(arg camera_sensor_x)" />
+        <param name="camera_sensor_y" value="$(arg camera_sensor_y)" />
+        <param name="camera_sensor_z" value="$(arg camera_sensor_z)" />
+        <param name="lidar_sensor_x" value="$(arg lidar_sensor_x)" />
+        <param name="lidar_sensor_y" value="$(arg lidar_sensor_y)" />
+        <param name="lidar_sensor_z" value="$(arg lidar_sensor_z)" />
+        <param name="_rule_sensor_on" value="$(arg _rule_sensor_on)" />
+        <param name="host" value="$(arg host)" />
+        <param name="port" value="$(arg port)" />
+    </node>
+
+	<node pkg="perception" type="start_signal.py" name="start_signal" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+	<node pkg="perception" type="image_pre_processor.py" name="image_pre_processor" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+	<node pkg="perception" type="lane_detector.py" name="lane_detector" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+
+	<node pkg="control" type="lane_keeping_control.py" name="lane_keeping" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/start.rviz" output="screen" />
+
+    <!-- <node pkg="rosbag" type="record" name="rosbag_record" output="screen" args="-O $(find integration)/bag/usb_cam_recorded_data.bag /usb_cam/image_raw" />     -->
+</launch>

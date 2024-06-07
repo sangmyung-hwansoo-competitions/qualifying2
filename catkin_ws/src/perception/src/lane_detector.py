@@ -29,8 +29,8 @@ class LaneDetector:
         self.last_processed_msg = None  # 마지막으로 발행된 이미지 메시지 저장
         self.last_point = Point()  # 마지막으로 발행된 Point 메시지 저장
 
-        self.rx_filter = MovingAverageFilter(20, FilteringMode.WEIGHTED)
-        self.lx_filter = MovingAverageFilter(20, FilteringMode.WEIGHTED)
+        self.rx_filter = MovingAverageFilter(25, FilteringMode.WEIGHTED)
+        self.lx_filter = MovingAverageFilter(25, FilteringMode.WEIGHTED)
 
         self.debug = True
 
@@ -41,7 +41,7 @@ class LaneDetector:
 
             ROI_img = roi(canny_img) # ROI 설정
 
-            line_arr = hough_lines(ROI_img, 1, 1 * np.pi/180, 20, 150, 15) # 허프 변환
+            line_arr = hough_lines(ROI_img, 1, 1 * np.pi/180, 35, 120, 60) # 허프 변환
 
             if line_arr is not None:
                 temp = np.zeros((canny_img.shape[0], canny_img.shape[1], 3), dtype=np.uint8)
@@ -73,7 +73,7 @@ class LaneDetector:
                 representative_right_line = select_representative_line(R_lines, width / 2)
 
                 # 이전 프레임의 대표선과 비교했을때, 하단의 x 좌표가 임계값 이상 차이날 시 이전 프레임의 대표선을 채택
-                x_threshold = 80
+                x_threshold = 150
                 if representative_left_line is not None and self.previous_left_line is not None:
                     if abs(representative_left_line[0][0] - self.previous_left_line[0][0]) > x_threshold:
                         representative_left_line = self.previous_left_line
@@ -88,18 +88,18 @@ class LaneDetector:
                 if representative_right_line is None and self.previous_right_line is not None:
                     representative_right_line = self.previous_right_line
 
-                # # 이전 프레임의 대표선과 비교했을 때, 기울기가 임계값 이하 차이날 시 이전 프레임의 대표선을 채택
-                # slope_threshold = 0.05 # 임계값 설정
+                # # 이전 프레임의 대표선과 비교했을 때, 기울기가 임계값 이상상 차이날 시 이전 프레임의 대표선을 채택
+                # slope_threshold = 3.5 # 임계값 설정
                 # if representative_left_line is not None and self.previous_left_line is not None:
                 #     current_slope_left = calculate_slope(representative_left_line.reshape(-1))
                 #     previous_slope_left = calculate_slope(self.previous_left_line.reshape(-1))
-                #     if abs(current_slope_left - previous_slope_left) < slope_threshold:
+                #     if abs(current_slope_left - previous_slope_left) > slope_threshold:
                 #         representative_left_line = self.previous_left_line
 
                 # if representative_right_line is not None and self.previous_right_line is not None:
                 #     current_slope_right = calculate_slope(representative_right_line.reshape(-1))
                 #     previous_slope_right = calculate_slope(self.previous_right_line.reshape(-1))
-                #     if abs(current_slope_right - previous_slope_right) < slope_threshold:
+                #     if abs(current_slope_right - previous_slope_right) > slope_threshold:
                 #         representative_right_line = self.previous_right_line
 
                 # 직선 그리기
@@ -110,7 +110,7 @@ class LaneDetector:
                     draw_lines(temp, [representative_right_line], color=[0, 255, 0])
                     self.previous_right_line = representative_right_line  # 업데이트  
 
-                y_target = 400
+                y_target = 325
                 x_left_at_y = calculate_x_at_y(y_target, representative_left_line)
                 x_right_at_y = calculate_x_at_y(y_target, representative_right_line)
                 
@@ -122,8 +122,8 @@ class LaneDetector:
                 smoothed_x = int((smoothed_lx + smoothed_rx)/2)
 
                 if smoothed_lx is not None and smoothed_rx is not None:
-                    cv2.circle(temp, (smoothed_x, 400), radius=10, color=(0, 255, 0), thickness=-1)
-                    cv2.circle(temp, (400, 400), radius=10, color=(0, 0, 255), thickness=-1)
+                    cv2.circle(temp, (smoothed_x, 325), radius=10, color=(0, 255, 0), thickness=-1)
+                    cv2.circle(temp, (400, 325), radius=10, color=(0, 0, 255), thickness=-1)
 
                 processed_image = weighted_img(temp, cv2.cvtColor(canny_img, cv2.COLOR_GRAY2BGR))  # 원본 이미지에 검출된 선 overlap
 
