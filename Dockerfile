@@ -79,37 +79,6 @@ RUN cd /tmp && git clone https://github.com/opencv/opencv.git && git clone https
     make -j$(nproc) && make install && \
     cd / && rm -rf /tmp/opencv /tmp/opencv_contrib
 
-# Build Pangolin
-RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
-    cd Pangolin && git checkout v0.6 && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j$(nproc) && make install && \
-    cd / && rm -rf /tmp/Pangolin
-
-# Build Ceres
-RUN apt install -y libgoogle-glog-dev libgflags-dev libatlas-base-dev
-
-# RUN cd /tmp && git clone https://github.com/ceres-solver/ceres-solver.git && \
-#     cd ceres-solver && git checkout 1.14.x && mkdir build && cd build && \
-#     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-#     make -j$(nproc) && make install && \
-#     cd / && rm -rf /tmp/ceres-solver
-
-# Build DSO
-RUN apt install -y libsuitesparse-dev libeigen3-dev libboost-all-dev zlib1g-dev
-
-RUN cd /tmp && git clone https://github.com/Lee-hwansoo/dso.git && \
-    cd dso && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j12
-
-# Build opengv
-RUN cd /tmp && git clone https://github.com/laurentkneip/opengv.git && \
-    cd opengv && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j$(nproc) && make install && \
-    cd / && rm -rf /tmp/opengv
-
 # 새로운 사용자 생성 및 홈 디렉토리 설정
 ARG USERNAME
 ARG PASSWORD

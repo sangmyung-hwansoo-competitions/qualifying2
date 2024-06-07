@@ -1,0 +1,17 @@
+<!-- -->
+<launch>
+    <include file="/home/divinetech/env.launch">
+      <arg name="camera_sensor_x" value="0.0" /> 
+      <arg name="camera_sensor_y" value="0.0" />
+      <arg name="camera_sensor_z" value="2.5" />
+      <arg name="lidar_sensor_x"  value="0.0" />
+      <arg name="lidar_sensor_y"  value="0.0" />
+      <arg name="lidar_sensor_z"  value="2.5" />
+    </include>
+
+	<node pkg="perception" type="start_signal.py" name="start_signal" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+	<node pkg="perception" type="image_pre_processor.py" name="image_pre_processor" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+	<node pkg="perception" type="lane_detector.py" name="lane_detector" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+
+	<node pkg="control" type="lane_keeping_control.py" name="lane_keeping" launch-prefix="bash -c 'sleep 3; $0 $@' " output="screen"/>
+</launch>

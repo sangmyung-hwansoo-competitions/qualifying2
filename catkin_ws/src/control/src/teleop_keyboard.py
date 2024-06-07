@@ -160,7 +160,7 @@ class World(object):
 
         self.player = None
         ## Rule Sensor 제거하시려면 주석처리 해주세요##
-        # self.rule_sensor = None
+        self.rule_sensor = None
         ###########################################
         self.imu_sensor = None
         self.camera_manager = None
@@ -229,7 +229,7 @@ class World(object):
                 if self.GetSearchEgoVehicle():
                     break
         ## Rule Sensor 제거하시려면 주석처리 해주세요##
-        # self.rule_sensor = RuleSensor(self.player)
+        self.rule_sensor = RuleSensor(self.player)
         ###########################################
         self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.Mdim, self._gamma)
@@ -256,15 +256,15 @@ class World(object):
 
     def destroy(self):
         #       rule sensor 사용
-        # sensors = [
-        #     self.camera_manager.sensor,
-        #     self.imu_sensor.sensor,
-        #     self.rule_sensor.sensor]
+        sensors = [
+            self.camera_manager.sensor,
+            self.imu_sensor.sensor,
+            self.rule_sensor.sensor]
          
         #       rule sensor 제거
-        sensors = [
-           self.camera_manager.sensor,
-           self.imu_sensor.sensor]
+        # sensors = [
+        #    self.camera_manager.sensor,
+        #    self.imu_sensor.sensor]
             
         for sensor in sensors:
             if sensor is not None:
@@ -559,28 +559,7 @@ class CameraManager(object):
                         self.lidar_range = float(attr_value)
 
             item.append(bp)
-            # self.sensor_params[item[0]] = self.extract_attributes(bp)
-
         self.index = None
-        # config_path = os.path.join('/home/ubuntu/catkin_ws/src/integration/config', 'sensors_info.yaml')
-        # self.save_sensors_info(config_path)
-        # print(f'Sensor parameters saved to {config_path}')
-
-    # def extract_attributes(self, blueprint):
-    #     attributes = {}
-    #     for attr in blueprint:
-    #         try:
-    #             value = blueprint.get_attribute(attr.id)
-    #             attributes[attr.id] = str(value)
-    #         except RuntimeError as e:
-    #             print(f"Error extracting attribute {attr.id}: {e}")
-    #             attributes[attr.id] = "N/A"
-    #     return attributes
-
-    # def save_sensors_info(self, filepath):
-    #     with open(filepath, 'w') as file:
-    #         yaml.dump(self.sensor_params, file, default_flow_style=False)
-
 
     def toggle_camera(self):
         self.transform_index = (self.transform_index + 1) % len(self._camera_transforms)
