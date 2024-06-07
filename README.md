@@ -4,40 +4,45 @@
 
 ``` bash
 .
-├── Dockerfile
-├── README.md
-├── build_container_ubuntu.sh
-├── catkin_ws
-│   └── src
-│       ├── CMakeLists.txt -> /opt/ros/noetic/share/catkin/cmake/toplevel.cmake
-│       ├── control
-│       │   ├── CMakeLists.txt
-│       │   ├── package.xml
-│       │   └── src
-│       │       └── teleop_keyboard.py
-│       ├── integration
-│       │   ├── CMakeLists.txt
-│       │   ├── bag
-│       │   │   └── usb_cam_recorded_data.bag
-│       │   ├── launch
-│       │   │   ├── play.launch
-│       │   │   └── record.launch
-│       │   └── package.xml
-│       └── visualization
-│           ├── CMakeLists.txt
-│           ├── package.xml
-│           ├── rviz
-│           └── src
-│               └── show_image.py
-└── sim_dependency
-    ├── carla-0.9.10-cp38-cp38-linux_x86_64.whl
-    ├── deb
-    │   ├── libcarla-0.9.10.deb
-    │   ├── recast-1.5.1.deb
-    │   ├── ros-noetic-carla-ctl_0.0.0-0focal_amd64.deb
-    │   ├── ros-noetic-xycar-msgs_0.0.0-0focal_amd64.deb
-    │   └── rpclib-2.2.1-3.deb
-    └── requirements.txt
+└── src
+    ├── CMakeLists.txt -> /opt/ros/noetic/share/catkin/cmake/toplevel.cmake
+    ├── control
+    │   ├── CMakeLists.txt
+    │   ├── package.xml
+    │   └── src
+    │       ├── lane_keeping_control.py
+    │       ├── pid_controller.py
+    │       └── teleop_keyboard.py
+    ├── integration
+    │   ├── CMakeLists.txt
+    │   ├── bag
+    │   ├── config
+    │   │   ├── integration.yaml
+    │   │   ├── ov2slam.yaml
+    │   │   └── sensors_info.yaml
+    │   ├── launch
+    │   │   ├── play.launch
+    │   │   └── record.launch
+    │   └── package.xml
+    ├── perception
+    │   ├── CMakeLists.txt
+    │   ├── package.xml
+    │   └── src
+    │       ├── image_pre_processor.py
+    │       ├── lane_detector.py
+    │       ├── moving_average_filter.py
+    │       ├── perception_utils.py
+    │       ├── sig_sync.py
+    │       └── start_signal.py
+    ├── start.launch
+    ├── test.launch
+    └── visualization
+        ├── CMakeLists.txt
+        ├── package.xml
+        ├── rviz
+        │   └── start.rviz
+        └── src
+            └── show_image.py
 ```
 
 ## Installation (WSL2)
@@ -55,7 +60,6 @@ $ sudo ./build_container_ubuntu.sh
 ``` bash
 # CarlaUE4 디렉토리 속 퍼블릭키 입력 후 윈도우 상에서 CarlaUE4.exe 실행
 $ sudo docker exec -it q2 bash
-$ roslaunch integration record.launch
-or
-$ record
+$ cd src
+$ roslaunch test.launch
 ```
