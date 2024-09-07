@@ -29,9 +29,16 @@
 <br/>
 <div style="display: flex; justify-content: space-around;">
   <img src="sample_images/차량좌표.png" width="45%" height="45%"/>
-  <img src="sample_images/sunshine.png" width="50%" height="50%"/>
+  <img src="sample_images/차선인식.png" width="40%" height="40%"/>
 </div>
 
+<br/>
+<br/>
+
+<div style="display: flex; justify-content: space-around;">
+  <img src="sample_images/신호등.png" width="40%" height="40%"/>
+  <img src="sample_images/sunshine.png" width="50%" height="50%"/>
+</div>
 
 <br/>
 
@@ -105,3 +112,20 @@ $ sudo docker exec -it q2 bash
 $ cd src
 $ roslaunch test.launch
 ```
+
+***
+***
+***
+## 추가 실험
+**ORB_SLAM**
+- ORB-SLAM으로 맵 구축 후 경로 생성을 하고자 하였음
+- loop closing의 빈번한 발생과 햇빛에 영향에 따른 환경의 급격한 변화로 맵 구축이 쉽지 않았음
+  - 추후 디버깅과 면밀한 코드 분석을 통해 성능 향상을 기대해볼 수 있을 것
+
+<br/>
+
+<div style="display: flex; justify-content: space-around;">
+  <img src="sample_images/IMG_1247.PNG" width="35%" height="35%"/>
+  <img src="sample_images/IMG_1.png" width="35%" height="35%"/>
+  <img src="sample_images/IMG_1249.PNG" width="25%" height="25%"/>
+</div>
