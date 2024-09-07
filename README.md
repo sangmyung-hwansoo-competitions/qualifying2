@@ -1,5 +1,47 @@
-# 제7회 국민대학교 자율주행 경진대회 예선2
+# 제7회 국민대학교 자율주행 경진대회 예선 과제2
 
+## Task
+- 3D 시뮬레이터 안의 주행트랙에서 차선을 따라 안정적으로 빠르게 주행하는 자율주행 SW 구현
+- 시뮬레이터: CarlaUE4 
+<br/>
+<img src="sample_images/슬라이드21.jpg" width="70%" height="70%"/> 
+
+***
+## 실행 영상
+<br/>
+<img src="sample_images/assignment_2(1).gif" width="70%" height="70%"/>
+<br/>
+
+[![assignment 2](http://img.youtube.com/vi/7npOJLXqHKo/0.jpg)](https://youtu.be/7npOJLXqHKo)
+
+***
+## Method
+**차선 인식 후 차량 제어**
+
+- **차선 인식:**
+    1. 차량 위쪽 카메라로 실시간 영상 받아옴
+    2. 실시간 영상 전처리
+    3. 직선 검출 알고리즘으로 차선 인식
+    <br/>
+- **차량 제어:**
+    - 검출된 좌우측 차선의 중앙을 따라가도록 차량 제어
+      
+<br/>
+<div style="display: flex; justify-content: space-around;">
+  <img src="sample_images/차량좌표.png" width="45%" height="45%"/>
+  <img src="sample_images/sunshine.png" width="50%" height="50%"/>
+</div>
+
+
+<br/>
+
++) 추가 고려점: 
+- 출발시 신호등 신호에 따라 출발
+- 햇빛에 따라 주변 배경 밝기가 많이 달라짐 
+
+
+
+***
 ## Project Tree (WSL2)
 
 ``` bash
@@ -44,7 +86,7 @@
         └── src
             └── show_image.py
 ```
-
+***
 ## Installation (WSL2)
 
 ``` bash
@@ -54,7 +96,7 @@ $ cd qualifying2
 $ sudo ./build_container_ubuntu.sh
 ```
 
-
+***
 ## Usage (WSL2)
 
 ``` bash
